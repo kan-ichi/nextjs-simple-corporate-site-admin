@@ -1,5 +1,6 @@
 import { RecordBase } from '@/common/types/RecordBase';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
+import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
 import { child, endAt, get, getDatabase, orderByKey, query, ref, remove, set } from 'firebase/database';
 /**
  * Firebase Realtime Database 関連の機能
@@ -12,16 +13,17 @@ export module FirebaseRealtimeDatabase {
     const dbRef = ref(getDatabase(), collectionName);
     const recordId = DbKeyUtils.generateDbKey();
     const recordRef = child(dbRef, recordId);
+    const createDateTime = DbKeyUtils.extractDateFromDbKey(recordId) as Date;
     const addData = {
       ...data,
-      updatedAt: DbKeyUtils.extractDateFromDbKey(recordId) as Date,
+      updatedAt: FormatDateUtils.yyyy_MM_dd_hhmmssfff(createDateTime),
     };
     await set(recordRef, addData);
     return {
       recordBase: {
         id: recordId,
-        createdAt: DbKeyUtils.extractDateFromDbKey(recordId) as Date,
-        updatedAt: addData.updatedAt,
+        createdAt: createDateTime,
+        updatedAt: createDateTime,
       },
       data,
     };
@@ -84,16 +86,17 @@ export module FirebaseRealtimeDatabase {
   ): Promise<{ recordBase: RecordBase; data: T }> {
     const dbRef = ref(getDatabase(), collectionName);
     const recordRef = child(dbRef, id);
+    const updateDateTime = new Date();
     const updateData = {
       ...data,
-      updatedAt: new Date(),
+      updatedAt: FormatDateUtils.yyyy_MM_dd_hhmmssfff(updateDateTime),
     };
     await set(recordRef, updateData);
     return {
       recordBase: {
         id: id,
         createdAt: DbKeyUtils.extractDateFromDbKey(id) as Date,
-        updatedAt: updateData.updatedAt,
+        updatedAt: updateDateTime,
       },
       data,
     };

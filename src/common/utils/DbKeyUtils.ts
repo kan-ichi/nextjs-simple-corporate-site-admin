@@ -5,9 +5,12 @@ export module DbKeyUtils {
   /**
    * DBキーを生成します。
    */
-  export function generateDbKey() {
+  export function generateDbKey(): string;
+  export function generateDbKey(date: Date): string;
+  export function generateDbKey(date?: Date): string {
+    date = date ?? new Date();
     const guidPart = window.crypto.randomUUID().replace(/\-/g, '');
-    return `${generateDbKeyDateTimePart(new Date())}${guidPart}`;
+    return `${generateDbKeyDateTimePart(date)}${guidPart}`;
   }
 
   /**
