@@ -1,46 +1,52 @@
 'use client';
-import { Category } from '@/common/types/Category';
-import { News, NewsRecord } from '@/common/types/News';
-import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
+import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Upload, message } from 'antd';
 import { useState } from 'react';
 
 export default function Home() {
-  const [news, setNews] = useState<NewsRecord[]>([]);
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [news, setNews] = useState<NewsRecord>({} as NewsRecord);
 
-  const handleClick = async () => {
-    const news: News = {
-      title: 'title',
-      description: 'description',
-      content: 'content',
-      thumbnail: {
-        url: 'url',
-        width: 100,
-        height: 100,
-      },
-      category: {
-        id: 'category-id',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        name: 'category-name',
-      },
-    };
-    await DalNews.addNews(news);
-    const test = await DalNews.getAllNews();
-    setNews(test);
+  const onFinish = async () => {
+    setLoading(true);
+    try {
+      await DalNews.addNews(news);
+      message.success('ニュースが登録されました');
+      form.resetFields();
+    } catch (error) {
+      message.error('ニュースの登録に失敗しました');
+    } finally {
+      setLoading(false);
+    }
   };
   return (
-    <>
-      <div className="flex flex-col">
-        <button className="rounded bg-blue-500 p-2 text-white" onClick={() => handleClick()}>
-          button
-        </button>
-        {news.map((item) => (
-          <div key={item.id}>
-            {item.id} {item.title}
-          </div>
-        ))}
-      </div>
-    </>
+    <Form form={form} name="news-form" onFinish={onFinish}>
+      <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
+        <Input onChange={(e) => setNews({ ...news, title: e.target.value })} />
+      </Form.Item>
+
+      <Form.Item name="description" label="説明" rules={[{ required: true, message: '説明を入力してください' }]}>
+        <Input.TextArea onChange={(e) => setNews({ ...news, description: e.target.value })} />
+      </Form.Item>
+
+      <Form.Item name="content" label="本文" rules={[{ required: true, message: '本文を入力してください' }]}>
+        <Input.TextArea onChange={(e) => setNews({ ...news, content: e.target.value })} />
+      </Form.Item>
+
+      <Form.Item name="thumbnail" label="サムネイル">
+        <Upload listType="picture">
+          <Button icon={<PlusOutlined />}>アップロード</Button>
+        </Upload>
+      </Form.Item>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          登録
+        </Button>
+      </Form.Item>
+    </Form>
   );
 }
