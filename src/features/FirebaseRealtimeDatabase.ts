@@ -79,7 +79,7 @@ export module FirebaseRealtimeDatabase {
   /**
    * DBのレコードを更新します
    */
-  export async function updateRecord<T>(
+  export async function updateRecord<T extends { id?: any }>(
     collectionName: string,
     data: T,
     id: string
@@ -91,7 +91,8 @@ export module FirebaseRealtimeDatabase {
       ...data,
       updatedAt: FormatDateUtils.yyyy_MM_dd_hhmmssfff(updateDateTime),
     };
-    await set(recordRef, updateData);
+    const { id: _, ...updateDataWithoutId } = updateData;
+    await set(recordRef, updateDataWithoutId);
     return {
       recordBase: {
         id: id,
