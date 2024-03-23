@@ -1,42 +1,38 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
-import { Button, Form, Input, message } from 'antd';
-import { useParams, useRouter } from 'next/navigation';
+import { Button, Form, Input, Popconfirm, message } from 'antd';
+import { useSearchParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-export interface EditNewsPageProps {
-  newsId: string;
-}
-
-const EditNewsPage: React.FC<EditNewsPageProps> = ({ newsId }) => {
+const NewsDetailsPage: React.FC = () => {
   const [form] = Form.useForm();
   const router = useRouter();
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id') as string;
 
   useEffect(() => {
     const fetchNewsData = async () => {
       try {
-        if (newsId) {
-          const news = await DalNews.getNewsById(newsId);
-          if (!news) {
-            message.error('ニュースを取得できません');
-            router.push('/news');
-            return;
-          }
-          setNewsData(news);
-          form.setFieldsValue(news);
+        const news = await DalNews.getNewsById(id);
+        if (!news) {
+          message.error('ニュースを取得できません');
+          router.push('/news');
+          return;
         }
+        setNewsData(news);
+        form.setFieldsValue(news);
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
     };
     fetchNewsData();
-  }, [newsId, form]);
+  }, []);
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      await DalNews.updateNews({ ...values, id: newsId });
+      await DalNews.updateNews({ ...values, id: id });
       message.success('ニュースが正常に更新されました');
       router.push('/news');
     } catch (error) {
@@ -47,7 +43,7 @@ const EditNewsPage: React.FC<EditNewsPageProps> = ({ newsId }) => {
 
   const handleDelete = async () => {
     try {
-      await DalNews.deleteNews(newsId);
+      await DalNews.deleteNews(id);
       message.success('ニュースが正常に削除されました');
       router.push('/news');
     } catch (error) {
@@ -71,13 +67,15 @@ const EditNewsPage: React.FC<EditNewsPageProps> = ({ newsId }) => {
             <Input.TextArea rows={6} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
+            <Button className="m-1" type="primary" htmlType="submit">
               更新
             </Button>
-            <Button danger onClick={handleDelete}>
-              削除
-            </Button>
-            <Button className="ml-2" onClick={() => router.push('/news')} type="default">
+            <Popconfirm title="本当に削除しますか？" onConfirm={handleDelete} okText="はい" cancelText="いいえ">
+              <Button className="m-1" danger>
+                削除
+              </Button>
+            </Popconfirm>
+            <Button className="m-1" onClick={() => router.push('/news')} type="default">
               キャンセル
             </Button>
           </Form.Item>
@@ -89,4 +87,4 @@ const EditNewsPage: React.FC<EditNewsPageProps> = ({ newsId }) => {
   );
 };
 
-export default EditNewsPage;
+export default NewsDetailsPage;

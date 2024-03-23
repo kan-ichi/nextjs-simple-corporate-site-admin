@@ -48,7 +48,7 @@ const NewsListPage: React.FC = () => {
       key: 'action',
       render: (text: string, record: NewsRecord) => (
         <>
-          <Link href={`/news/${record.id}`}>
+          <Link href={`/news/details?id=${record.id}`}>
             <Button type="primary" style={{ marginRight: 8 }}>
               詳細表示・編集
             </Button>
