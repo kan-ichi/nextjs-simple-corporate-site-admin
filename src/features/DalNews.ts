@@ -21,4 +21,23 @@ export module DalNews {
     const records = await FirebaseRealtimeDatabase.getAllRecords(FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS);
     return records.map((record) => ({ ...record.recordBase, ...(record.data as News) }));
   }
+
+  /**
+   * DBの News を更新します
+   */
+  export async function updateNews(data: NewsRecord): Promise<NewsRecord> {
+    const record = await FirebaseRealtimeDatabase.updateRecord(
+      FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS,
+      data,
+      data.id
+    );
+    return { ...record.recordBase, ...record.data };
+  }
+
+  /**
+   * DBから News を削除します
+   */
+  export async function deleteNews(id: string): Promise<void> {
+    await FirebaseRealtimeDatabase.deleteRecord(FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS, id);
+  }
 }
