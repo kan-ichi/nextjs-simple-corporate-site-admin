@@ -15,6 +15,14 @@ export module DalNews {
   }
 
   /**
+   * DBから News を取得します
+   */
+  export async function getNewsById(id: string): Promise<NewsRecord | undefined> {
+    const record = await FirebaseRealtimeDatabase.getRecordById(FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS, id);
+    return record ? { ...record.recordBase, ...(record.data as News) } : undefined;
+  }
+
+  /**
    * DBから News を全件取得します
    */
   export async function getAllNews(): Promise<NewsRecord[]> {
