@@ -53,30 +53,30 @@ export default function NewsListPage() {
 
   const columns = [
     {
-      title: '日付',
+      width: '12%',
+      title: '作成・更新',
       key: 'date',
       render: (text: string, record: NewsRecord) => (
         <>
           {FormatDateUtils.yyyyMMdd(record.createdAt ?? null)}
           <br />
-          {console.log(record.updatedAt)}
           {FormatDateUtils.yyyyMMdd(record.updatedAt ?? null)}
         </>
       ),
     },
     {
+      width: '30%',
       title: 'タイトル',
       dataIndex: 'title',
       key: 'title',
     },
     {
-      width: '50%',
       title: '説明',
       dataIndex: 'description',
       key: 'description',
     },
     {
-      width: '25%',
+      width: '20%',
       title: '操作',
       key: 'action',
       render: (text: string, record: NewsRecord) => (
