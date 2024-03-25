@@ -3,9 +3,9 @@ import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
 import { Button, Form, Input, Popconfirm, message } from 'antd';
 import { useSearchParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const NewsDetailsPage: React.FC = () => {
+export default function NewsDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
@@ -85,6 +85,4 @@ const NewsDetailsPage: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default NewsDetailsPage;
+}

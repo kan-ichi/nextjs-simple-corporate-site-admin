@@ -3,9 +3,8 @@ import { News } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
 import { Button, Form, Input, message } from 'antd';
 import { useRouter } from 'next/navigation';
-import React from 'react';
 
-const AddNewsPage: React.FC = () => {
+export default function AddNewsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
 
@@ -45,6 +44,4 @@ const AddNewsPage: React.FC = () => {
       </Form>
     </div>
   );
-};
-
-export default AddNewsPage;
+}

@@ -3,9 +3,9 @@ import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
 import { Button, Popconfirm, Table, message } from 'antd';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const NewsListPage: React.FC = () => {
+export default function NewsListPage() {
   const [newsList, setNewsList] = useState<NewsRecord[]>([]);
 
   useEffect(() => {
@@ -77,6 +77,4 @@ const NewsListPage: React.FC = () => {
       <Table dataSource={newsList} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
     </div>
   );
-};
-
-export default NewsListPage;
+}
