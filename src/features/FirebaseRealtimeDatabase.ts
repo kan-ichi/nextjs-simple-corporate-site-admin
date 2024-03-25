@@ -45,7 +45,7 @@ export module FirebaseRealtimeDatabase {
         recordBase: {
           id: id,
           createdAt: DbKeyUtils.extractDateFromDbKey(id) as Date,
-          updatedAt: recordData.updatedAt as Date,
+          updatedAt: isNaN(new Date(recordData.updatedAt).getTime()) ? undefined : new Date(recordData.updatedAt),
         },
         data: recordData,
       };
@@ -64,12 +64,14 @@ export module FirebaseRealtimeDatabase {
     if (recordsSnapshot.exists()) {
       const data = recordsSnapshot.val();
       return Object.entries(data).map(([id, value]) => ({
+        data: value as T,
         recordBase: {
           id,
           createdAt: DbKeyUtils.extractDateFromDbKey(id) as Date,
-          updatedAt: (value as any).updatedAt as Date,
-        },
-        data: value as T,
+          updatedAt: isNaN(new Date((value as any).updatedAt).getTime())
+            ? undefined
+            : new Date((value as any).updatedAt),
+        } as RecordBase,
       }));
     } else {
       return [];

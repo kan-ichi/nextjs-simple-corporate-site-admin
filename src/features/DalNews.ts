@@ -19,7 +19,7 @@ export module DalNews {
    */
   export async function getNewsById(id: string): Promise<NewsRecord | undefined> {
     const record = await FirebaseRealtimeDatabase.getRecordById(FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS, id);
-    return record ? { ...record.recordBase, ...(record.data as News) } : undefined;
+    return record ? { ...(record.data as News), ...record.recordBase } : undefined;
   }
 
   /**
@@ -27,7 +27,14 @@ export module DalNews {
    */
   export async function getAllNews(): Promise<NewsRecord[]> {
     const records = await FirebaseRealtimeDatabase.getAllRecords(FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS);
-    return records.map((record) => ({ ...record.recordBase, ...(record.data as News) }));
+    return records.map(
+      (record): NewsRecord => ({
+        ...(record.data as News),
+        id: record.recordBase.id,
+        createdAt: record.recordBase.createdAt,
+        updatedAt: record.recordBase.updatedAt,
+      })
+    );
   }
 
   /**
