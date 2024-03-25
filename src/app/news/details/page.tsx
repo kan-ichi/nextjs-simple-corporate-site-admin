@@ -1,14 +1,25 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
-import { Button, Form, Input, Popconfirm, message } from 'antd';
-import { useSearchParams, useRouter } from 'next/navigation';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function NewsDetailsPage() {
-  const [form] = Form.useForm();
   const router = useRouter();
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
 
@@ -17,12 +28,11 @@ export default function NewsDetailsPage() {
       try {
         const news = await DalNews.getNewsById(id);
         if (!news) {
-          message.error('ニュースを取得できません');
+          alert('ニュースを取得できません');
           router.push('/news');
           return;
         }
         setNewsData(news);
-        form.setFieldsValue(news);
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
@@ -30,59 +40,98 @@ export default function NewsDetailsPage() {
     fetchNewsData();
   }, []);
 
-  const handleUpdate = async (values: NewsRecord) => {
+  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const updatedNews = {
+      id,
+      title: form.get('title') as string,
+      description: form.get('description') as string,
+      content: form.get('content') as string,
+    };
     try {
-      await DalNews.updateNews({ ...values, id: id });
-      message.success('ニュースが正常に更新されました');
+      await DalNews.updateNews(updatedNews);
+      alert('ニュースが正常に更新されました');
       router.push('/news');
     } catch (error) {
       console.error('Failed to update news:', error);
-      message.error('ニュースの更新に失敗しました');
+      alert('ニュースの更新に失敗しました');
     }
   };
 
   const handleDelete = async () => {
     try {
       await DalNews.deleteNews(id);
-      message.success('ニュースが正常に削除されました');
+      alert('ニュースが正常に削除されました');
       router.push('/news');
     } catch (error) {
       console.error('Failed to delete news:', error);
-      message.error('ニュースの削除に失敗しました');
+      alert('ニュースの削除に失敗しました');
     }
   };
 
   return (
-    <div>
-      <h1>ニュース編集</h1>
+    <Box>
+      <Typography variant="h4" component="h1" gutterBottom>
+        ニュース編集
+      </Typography>
       {newsData ? (
-        <Form form={form} onFinish={handleUpdate} initialValues={newsData}>
-          <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="説明" rules={[{ required: true, message: '説明を入力してください' }]}>
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
-            <Input.TextArea rows={6} />
-          </Form.Item>
-          <Form.Item>
-            <Button className="m-1" type="primary" htmlType="submit">
+        <Box component="form" onSubmit={handleUpdate}>
+          <TextField fullWidth margin="normal" label="タイトル" name="title" defaultValue={newsData.title} required />
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            margin="normal"
+            label="説明"
+            name="description"
+            defaultValue={newsData.description}
+            required
+          />
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            margin="normal"
+            label="内容"
+            name="content"
+            defaultValue={newsData.content}
+            required
+          />
+          <Box display="flex" justifyContent="space-between" marginTop={2}>
+            <Button type="submit" variant="contained" color="primary">
               更新
             </Button>
-            <Popconfirm title="本当に削除しますか？" onConfirm={handleDelete} okText="はい" cancelText="いいえ">
-              <Button className="m-1" danger>
-                削除
-              </Button>
-            </Popconfirm>
-            <Button className="m-1" onClick={() => router.push('/news')} type="default">
+            <Button variant="outlined" color="inherit" onClick={() => setDeleteDialogOpen(true)}>
+              削除
+            </Button>
+            <Button variant="outlined" color="inherit" onClick={() => router.push('/news')}>
               キャンセル
             </Button>
-          </Form.Item>
-        </Form>
+          </Box>
+        </Box>
       ) : (
-        <p>ニュースデータを読み込み中...</p>
+        <Typography>ニュースデータを読み込み中...</Typography>
       )}
-    </div>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">確認</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">本当に削除しますか？</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            キャンセル
+          </Button>
+          <Button onClick={handleDelete} color="primary" autoFocus>
+            削除
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
