@@ -1,7 +1,8 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
-import { Button, DatePicker, Form, Input, Popconfirm, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Form, Input, Popconfirm, Upload, message } from 'antd';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -13,6 +14,7 @@ export default function NewsDetailsPage() {
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -34,7 +36,29 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      await DalNews.updateNews({ ...values, id: id });
+      // const { fileList } = (values as any).image || {};
+      // let base64Image: string | undefined;
+
+      // console.log(fileList);
+
+      // if (fileList && fileList.length > 0) {
+      //   const file = fileList[0].originFileObj;
+      //   if (file) {
+      //     base64Image = await convertToBase64(file);
+      //   }
+      // }
+      // const fileList = (values as any).image[0].thumbUrl;
+      // const base64Image = previewImage ?? (await convertToBase64(previewImage));
+
+      console.log(previewImage);
+
+      const updatedNews: NewsRecord = {
+        ...values,
+        id,
+        image_id: previewImage ?? values.image_id,
+      };
+
+      await DalNews.updateNews(updatedNews);
       message.success('ニュースが正常に更新されました');
       router.push('/news');
     } catch (error) {
@@ -42,6 +66,23 @@ export default function NewsDetailsPage() {
       message.error('ニュースの更新に失敗しました');
     }
   };
+
+  // ファイルを Base64 エンコーディングする関数
+  const convertToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        if (typeof fileReader.result === 'string') {
+          resolve(fileReader.result.split(',')[1]);
+        } else {
+          reject(new Error('Failed to convert file to base64'));
+        }
+      };
+      fileReader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+    });
 
   const handleDelete = async () => {
     try {
@@ -102,7 +143,60 @@ export default function NewsDetailsPage() {
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
             <Input.TextArea rows={6} />
           </Form.Item>
-          <Form.Item>
+          {/* <Form.Item
+            name="image"
+            label="画像"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => {
+              if (Array.isArray(e)) {
+                return e;
+              }
+              return e?.fileList;
+            }}
+          > */}
+          <Upload
+            // name="image"
+            listType="picture-card"
+            // listType="picture"
+            maxCount={1}
+            // showUploadList={false}
+            showUploadList={{
+              showPreviewIcon: true,
+              showRemoveIcon: true,
+              showDownloadIcon: true,
+            }}
+            beforeUpload={(file) => {
+              const isValidType = file.type.startsWith('image/');
+              if (!isValidType) {
+                message.error('画像ファイルを選択してください');
+              } else {
+                setPreviewImage(URL.createObjectURL(file));
+              }
+              return isValidType || Upload.LIST_IGNORE;
+            }}
+            onChange={(info) => {
+              if (info.file.status === 'uploading') {
+                // uploading...
+              }
+              if (info.file.status === 'done') {
+                // upload success
+              }
+              if (info.file.status === 'error') {
+                message.error('アップロードに失敗しました');
+              }
+            }}
+          >
+            {/* {previewImage ? (
+                <img src={previewImage} alt="preview" style={{ maxWidth: '100%', maxHeight: 300 }} />
+              ) : ( */}
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>画像をアップロード</div>
+            </div>
+            {/* )} */}
+          </Upload>
+          {/* </Form.Item> */}
+          <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
               更新
             </Button>
