@@ -43,7 +43,7 @@ export module FormatDateUtils {
   export function yyyyMMdd(date: string | Date | null): string {
     if (!date) return '';
     if (typeof date === 'string') {
-      return date.replaceAll('-', '/');
+      return date.split(' ')[0].replaceAll('-', '/');
     }
     const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
@@ -62,7 +62,7 @@ export module FormatDateUtils {
   export function yyyy_MM_dd(date: string | Date | null): string {
     if (!date) return '';
     if (typeof date === 'string') {
-      return date.replaceAll('/', '-');
+      return date.split(' ')[0].replaceAll('/', '-');
     }
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');

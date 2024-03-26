@@ -6,7 +6,7 @@ import { RecordBase } from '@/common/types/RecordBase';
  * ニュースの型定義
  */
 export interface News {
-  release_date?: Date;
+  release_date: string;
   title: string;
   description: string;
   content: string;

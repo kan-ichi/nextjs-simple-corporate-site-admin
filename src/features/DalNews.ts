@@ -10,7 +10,6 @@ export module DalNews {
    * News をDBに追加し、追加したレコードを返します
    */
   export async function addNews(data: News): Promise<NewsRecord> {
-    data.release_date = FirebaseRealtimeDatabase.convertStringToDateTime(data.release_date);
     const record = await FirebaseRealtimeDatabase.addRecord(FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS, {
       ...data,
       release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
@@ -18,7 +17,6 @@ export module DalNews {
     return {
       ...record.recordBase,
       ...record.data,
-      release_date: FirebaseRealtimeDatabase.convertStringToDateTime(record.data.release_date),
     };
   }
 
@@ -30,7 +28,6 @@ export module DalNews {
     return record
       ? {
           ...(record.data as News),
-          release_date: FirebaseRealtimeDatabase.convertStringToDateTime((record.data as News).release_date),
           ...record.recordBase,
         }
       : undefined;
@@ -44,7 +41,6 @@ export module DalNews {
     return records.map(
       (record): NewsRecord => ({
         ...(record.data as News),
-        release_date: FirebaseRealtimeDatabase.convertStringToDateTime((record.data as News).release_date as Date),
         ...record.recordBase,
       })
     );
@@ -54,8 +50,6 @@ export module DalNews {
    * DBの News を更新します
    */
   export async function updateNews(data: NewsRecord): Promise<NewsRecord> {
-    data.release_date = FirebaseRealtimeDatabase.convertStringToDateTime(data.release_date);
-    console.log(data.release_date);
     const record = await FirebaseRealtimeDatabase.updateRecord(
       FIREBASE_REALTIME_DATABASE.COLLECTION_NAME_NEWS,
       { ...data, release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date) },
@@ -64,7 +58,6 @@ export module DalNews {
     return {
       ...record.recordBase,
       ...record.data,
-      release_date: FirebaseRealtimeDatabase.convertStringToDateTime(record.data.release_date),
     };
   }
 

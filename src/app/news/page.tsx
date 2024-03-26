@@ -56,7 +56,8 @@ export default function NewsListPage() {
       width: '10%',
       title: 'リリース日',
       key: 'date',
-      render: (text: string, record: NewsRecord) => <>{FormatDateUtils.yyyyMMdd(record.release_date ?? null)}</>,
+      align: 'center' as const,
+      render: (text: string, record: NewsRecord) => <>{FormatDateUtils.yyyyMMdd(record.release_date)}</>,
     },
     {
       width: '30%',

@@ -2,6 +2,8 @@
 import { News } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
 import { Button, DatePicker, Form, Input, message } from 'antd';
+import locale from 'antd/es/date-picker/locale/ja_JP';
+import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 
 export default function AddNewsPage() {
@@ -27,9 +29,35 @@ export default function AddNewsPage() {
         <Form.Item
           name="release_date"
           label="リリース日"
-          rules={[{ required: true, message: 'リリース日を入力してください' }]}
+          getValueProps={(value) => ({
+            value: value ? dayjs(value) : null,
+          })}
+          rules={[
+            {
+              required: true,
+              message: 'リリース日を入力してください',
+            },
+            {
+              validator: (_, value) => {
+                if (!value) {
+                  return Promise.resolve();
+                }
+                const dayJsValue = dayjs(value);
+                if (dayJsValue.isValid()) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('不正な日付形式です'));
+              },
+            },
+          ]}
         >
-          <DatePicker />
+          <DatePicker
+            locale={locale}
+            format="YYYY/MM/DD"
+            onChange={(date, dateString) => {
+              form.setFieldsValue({ release_date: date ? date.toDate() : null });
+            }}
+          />
         </Form.Item>
         <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
           <Input />

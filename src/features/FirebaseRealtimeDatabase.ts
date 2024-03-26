@@ -136,18 +136,11 @@ export module FirebaseRealtimeDatabase {
   }
 
   /**
-   * 日付型をDB格納可能な文字列に変換します
-   */
-  // function convertDateTimeToDbDateTimeString(dateTime: Date): string {
-  //   return FormatDateUtils.yyyy_MM_dd_hhmmssfff(dateTime);
-  // }
-
-  /**
    * DBでは文字列として格納されていた値を日時に変換します
    */
-  export function convertStringToDateTime(dateString: string): Date | undefined;
-  export function convertStringToDateTime(dateTime: Date | undefined): Date | undefined;
-  export function convertStringToDateTime(dateString: string | Date | undefined): Date | undefined {
+  function convertStringToDateTime(dateString: string): Date | undefined;
+  function convertStringToDateTime(dateTime: Date | undefined): Date | undefined;
+  function convertStringToDateTime(dateString: string | Date | undefined): Date | undefined {
     if (!dateString) return undefined;
     if (dateString instanceof Date) return dateString;
     return isNaN(new Date(dateString).getTime()) ? undefined : new Date(dateString);
@@ -160,6 +153,7 @@ export module FirebaseRealtimeDatabase {
   export function convertDateTimeStringToDbDateTimeString(dateTimeString: Date | undefined): string;
   export function convertDateTimeStringToDbDateTimeString(dateTimeString: string | Date | undefined): string {
     if (!dateTimeString) return '';
+    // スラッシュ文字を Firebase Realtime Database に格納できない制約があるので、ハイフン文字に変換する必要がある
     if (dateTimeString instanceof Date) {
       return FormatDateUtils.yyyy_MM_dd_hhmmssfff(dateTimeString);
     }

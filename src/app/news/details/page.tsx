@@ -18,23 +18,13 @@ export default function NewsDetailsPage() {
     const fetchNewsData = async () => {
       try {
         const news = await DalNews.getNewsById(id);
-        // news?.release_date && (news.release_date = new Date(news.release_date));
         if (!news) {
           message.error('ニュースを取得できません');
           router.push('/news');
           return;
         }
-
-        const newsWithDateRelease = {
-          ...news,
-          release_date: news.release_date ? news.release_date : undefined, // nullの場合はundefinedを渡す
-          // release_date: undefined, // nullの場合はundefinedを渡す
-          // release_date: new Date(),
-        };
-        setNewsData(newsWithDateRelease);
-        form.setFieldsValue(newsWithDateRelease);
-        // setNewsData(news);
-        // form.setFieldsValue(news);
+        setNewsData(news);
+        form.setFieldsValue(news);
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
@@ -44,7 +34,6 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      console.log(values);
       await DalNews.updateNews({ ...values, id: id });
       message.success('ニュースが正常に更新されました');
       router.push('/news');
@@ -73,18 +62,6 @@ export default function NewsDetailsPage() {
           <Form.Item
             name="release_date"
             label="リリース日"
-            // initialValue={moment(newsData.release_date)}
-            // getValueProps={(i) => ({ value: moment(i) })}
-            //     defaultValue={moment(newsData.release_date)}
-            // getValueProps={(value) => ({
-            //   value: value ? moment(value) : null,
-            // })}
-            // getValueProps={(value) => ({
-            //   value: value ? dayjs(value).toDate() : null,
-            // })}
-            // getValueProps={(value) => ({
-            //   value: value ? dayjs(value).format() : null,
-            // })}
             getValueProps={(value) => ({
               value: value ? dayjs(value) : null,
             })}
@@ -92,7 +69,6 @@ export default function NewsDetailsPage() {
               {
                 required: true,
                 message: 'リリース日を入力してください',
-                // type: 'object' as const,
               },
               {
                 validator: (_, value) => {
@@ -110,18 +86,12 @@ export default function NewsDetailsPage() {
           >
             <DatePicker
               locale={locale}
-              // bordered={false}
-              // value={newsData?.release_date ? moment(newsData.release_date) : null}
-              // onChange={(date, dateString) => {
-              //   form.setFieldsValue({ release_date: date });
-              // }}
-              // value={dayjs(newsData?.release_date)}
+              format="YYYY/MM/DD"
               value={newsData?.release_date ? dayjs(newsData.release_date) : null}
               onChange={(date, dateString) => {
                 form.setFieldsValue({ release_date: date ? date.toDate() : null });
               }}
             />
-            {/* <Input /> */}
           </Form.Item>
           <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
             <Input />
