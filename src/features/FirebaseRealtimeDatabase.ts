@@ -91,7 +91,7 @@ export module FirebaseRealtimeDatabase {
       ...data,
       updated_at: convertDateTimeStringToDbDateTimeString(updateDateTime),
     };
-    const { id: _, ...updateDataWithoutId } = updateData;
+    const { id: _, ...updateDataWithoutId } = updateData; // 更新データ部分から項目「id」を除去
     await set(recordRef, updateDataWithoutId);
     return {
       recordBase: {
