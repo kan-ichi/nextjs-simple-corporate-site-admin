@@ -1,7 +1,7 @@
 'use client';
 import { News } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
-import { Button, Form, Input, message } from 'antd';
+import { Button, DatePicker, Form, Input, message } from 'antd';
 import { useRouter } from 'next/navigation';
 
 export default function AddNewsPage() {
@@ -24,6 +24,13 @@ export default function AddNewsPage() {
     <div>
       <h1>新規ニュース登録</h1>
       <Form form={form} onFinish={handleSubmit}>
+        <Form.Item
+          name="release_date"
+          label="リリース日"
+          rules={[{ required: true, message: 'リリース日を入力してください' }]}
+        >
+          <DatePicker />
+        </Form.Item>
         <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
           <Input />
         </Form.Item>

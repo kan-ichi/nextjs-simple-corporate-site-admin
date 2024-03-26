@@ -38,8 +38,13 @@ export module FormatDateUtils {
   /**
    * 日付を YYYY/MM/DD 文字列にフォーマットします。
    */
-  export function yyyyMMdd(date: Date | null): string {
+  export function yyyyMMdd(date: string): string;
+  export function yyyyMMdd(date: Date | null): string;
+  export function yyyyMMdd(date: string | Date | null): string {
     if (!date) return '';
+    if (typeof date === 'string') {
+      return date.replaceAll('-', '/');
+    }
     const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: '2-digit',
@@ -47,6 +52,22 @@ export module FormatDateUtils {
     };
     const formattedDate = new Intl.DateTimeFormat('ja-JP', options).format(date);
     return formattedDate;
+  }
+
+  /**
+   * 日付を YYYY-MM-DD 文字列にフォーマットします。
+   */
+  export function yyyy_MM_dd(date: string): string;
+  export function yyyy_MM_dd(date: Date | null): string;
+  export function yyyy_MM_dd(date: string | Date | null): string {
+    if (!date) return '';
+    if (typeof date === 'string') {
+      return date.replaceAll('/', '-');
+    }
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   /**

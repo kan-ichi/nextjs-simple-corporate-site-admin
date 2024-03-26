@@ -13,17 +13,17 @@ export module FirebaseRealtimeDatabase {
     const dbRef = ref(getDatabase(), collectionName);
     const recordId = DbKeyUtils.generateDbKey();
     const recordRef = child(dbRef, recordId);
-    const createDateTime = DbKeyUtils.extractDateFromDbKey(recordId) as Date;
+    const createDateTime = convertDbKeyToDate(recordId);
     const addData = {
       ...data,
-      updatedAt: FormatDateUtils.yyyy_MM_dd_hhmmssfff(createDateTime),
+      updated_at: convertDateTimeStringToDbDateTimeString(createDateTime),
     };
     await set(recordRef, addData);
     return {
       recordBase: {
         id: recordId,
-        createdAt: createDateTime,
-        updatedAt: createDateTime,
+        created_at: createDateTime,
+        updated_at: createDateTime,
       },
       data,
     };
@@ -44,8 +44,8 @@ export module FirebaseRealtimeDatabase {
       return {
         recordBase: {
           id: id,
-          createdAt: DbKeyUtils.extractDateFromDbKey(id) as Date,
-          updatedAt: isNaN(new Date(recordData.updatedAt).getTime()) ? undefined : new Date(recordData.updatedAt),
+          created_at: convertDbKeyToDate(id),
+          updated_at: convertStringToDateTime(recordData.updated_at),
         },
         data: recordData,
       };
@@ -67,10 +67,8 @@ export module FirebaseRealtimeDatabase {
         data: value as T,
         recordBase: {
           id,
-          createdAt: DbKeyUtils.extractDateFromDbKey(id) as Date,
-          updatedAt: isNaN(new Date((value as any).updatedAt).getTime())
-            ? undefined
-            : new Date((value as any).updatedAt),
+          created_at: convertDbKeyToDate(id),
+          updated_at: convertStringToDateTime((value as any).updated_at),
         } as RecordBase,
       }));
     } else {
@@ -91,15 +89,15 @@ export module FirebaseRealtimeDatabase {
     const updateDateTime = new Date();
     const updateData = {
       ...data,
-      updatedAt: FormatDateUtils.yyyy_MM_dd_hhmmssfff(updateDateTime),
+      updated_at: convertDateTimeStringToDbDateTimeString(updateDateTime),
     };
     const { id: _, ...updateDataWithoutId } = updateData;
     await set(recordRef, updateDataWithoutId);
     return {
       recordBase: {
         id: id,
-        createdAt: DbKeyUtils.extractDateFromDbKey(id) as Date,
-        updatedAt: updateDateTime,
+        created_at: convertDbKeyToDate(id),
+        updated_at: updateDateTime,
       },
       data,
     };
@@ -128,5 +126,43 @@ export module FirebaseRealtimeDatabase {
     snapshot.forEach((childSnapshot) => {
       remove(childSnapshot.ref);
     });
+  }
+
+  /**
+   * DBのキーを日時に変換します
+   */
+  function convertDbKeyToDate(dbKey: string): Date {
+    return DbKeyUtils.extractDateFromDbKey(dbKey) as Date;
+  }
+
+  /**
+   * 日付型をDB格納可能な文字列に変換します
+   */
+  // function convertDateTimeToDbDateTimeString(dateTime: Date): string {
+  //   return FormatDateUtils.yyyy_MM_dd_hhmmssfff(dateTime);
+  // }
+
+  /**
+   * DBでは文字列として格納されていた値を日時に変換します
+   */
+  export function convertStringToDateTime(dateString: string): Date | undefined;
+  export function convertStringToDateTime(dateTime: Date | undefined): Date | undefined;
+  export function convertStringToDateTime(dateString: string | Date | undefined): Date | undefined {
+    if (!dateString) return undefined;
+    if (dateString instanceof Date) return dateString;
+    return isNaN(new Date(dateString).getTime()) ? undefined : new Date(dateString);
+  }
+
+  /**
+   * 日時文字列／日付型をDB格納可能な文字列に変換します
+   */
+  export function convertDateTimeStringToDbDateTimeString(dateTimeString: string): string;
+  export function convertDateTimeStringToDbDateTimeString(dateTimeString: Date | undefined): string;
+  export function convertDateTimeStringToDbDateTimeString(dateTimeString: string | Date | undefined): string {
+    if (!dateTimeString) return '';
+    if (dateTimeString instanceof Date) {
+      return FormatDateUtils.yyyy_MM_dd_hhmmssfff(dateTimeString);
+    }
+    return dateTimeString.replaceAll('/', '-');
   }
 }

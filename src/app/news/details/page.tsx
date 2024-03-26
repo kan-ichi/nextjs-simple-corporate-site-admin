@@ -1,8 +1,10 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
 import { DalNews } from '@/features/DalNews';
-import { Button, Form, Input, Popconfirm, message } from 'antd';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { Button, DatePicker, Form, Input, Popconfirm, message } from 'antd';
+import locale from 'antd/es/date-picker/locale/ja_JP';
+import dayjs from 'dayjs';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function NewsDetailsPage() {
@@ -16,13 +18,23 @@ export default function NewsDetailsPage() {
     const fetchNewsData = async () => {
       try {
         const news = await DalNews.getNewsById(id);
+        // news?.release_date && (news.release_date = new Date(news.release_date));
         if (!news) {
           message.error('ニュースを取得できません');
           router.push('/news');
           return;
         }
-        setNewsData(news);
-        form.setFieldsValue(news);
+
+        const newsWithDateRelease = {
+          ...news,
+          release_date: news.release_date ? news.release_date : undefined, // nullの場合はundefinedを渡す
+          // release_date: undefined, // nullの場合はundefinedを渡す
+          // release_date: new Date(),
+        };
+        setNewsData(newsWithDateRelease);
+        form.setFieldsValue(newsWithDateRelease);
+        // setNewsData(news);
+        // form.setFieldsValue(news);
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
@@ -32,6 +44,7 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
+      console.log(values);
       await DalNews.updateNews({ ...values, id: id });
       message.success('ニュースが正常に更新されました');
       router.push('/news');
@@ -57,6 +70,59 @@ export default function NewsDetailsPage() {
       <h1>ニュース編集</h1>
       {newsData ? (
         <Form form={form} onFinish={handleUpdate} initialValues={newsData}>
+          <Form.Item
+            name="release_date"
+            label="リリース日"
+            // initialValue={moment(newsData.release_date)}
+            // getValueProps={(i) => ({ value: moment(i) })}
+            //     defaultValue={moment(newsData.release_date)}
+            // getValueProps={(value) => ({
+            //   value: value ? moment(value) : null,
+            // })}
+            // getValueProps={(value) => ({
+            //   value: value ? dayjs(value).toDate() : null,
+            // })}
+            // getValueProps={(value) => ({
+            //   value: value ? dayjs(value).format() : null,
+            // })}
+            getValueProps={(value) => ({
+              value: value ? dayjs(value) : null,
+            })}
+            rules={[
+              {
+                required: true,
+                message: 'リリース日を入力してください',
+                // type: 'object' as const,
+              },
+              {
+                validator: (_, value) => {
+                  if (!value) {
+                    return Promise.resolve();
+                  }
+                  const dayJsValue = dayjs(value);
+                  if (dayJsValue.isValid()) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('不正な日付形式です'));
+                },
+              },
+            ]}
+          >
+            <DatePicker
+              locale={locale}
+              // bordered={false}
+              // value={newsData?.release_date ? moment(newsData.release_date) : null}
+              // onChange={(date, dateString) => {
+              //   form.setFieldsValue({ release_date: date });
+              // }}
+              // value={dayjs(newsData?.release_date)}
+              value={newsData?.release_date ? dayjs(newsData.release_date) : null}
+              onChange={(date, dateString) => {
+                form.setFieldsValue({ release_date: date ? date.toDate() : null });
+              }}
+            />
+            {/* <Input /> */}
+          </Form.Item>
           <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
             <Input />
           </Form.Item>
