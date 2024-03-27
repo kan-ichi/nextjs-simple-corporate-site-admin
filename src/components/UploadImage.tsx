@@ -6,15 +6,23 @@ import { useState } from 'react';
 interface UploadImageProps {
   initialImageFileList: UploadFile[];
   onImageFileListChange: (fileList: UploadFile[]) => void;
+  onImageFileRemoved: () => void;
 }
 
-export default function UploadImage({ initialImageFileList, onImageFileListChange }: UploadImageProps) {
-  const [fileList, setFileList] = useState<UploadFile[]>(initialImageFileList);
+export default function UploadImage({
+  initialImageFileList,
+  onImageFileListChange,
+  onImageFileRemoved,
+}: UploadImageProps) {
+  const [imageFileList, setImageFileList] = useState<UploadFile[]>(initialImageFileList);
 
   const handleRemove = (file: UploadFile) => {
-    const updatedFileList = fileList.filter((f) => f.uid !== file.uid);
-    setFileList(updatedFileList);
+    const updatedFileList = imageFileList.filter((f) => f.uid !== file.uid);
+    setImageFileList(updatedFileList);
     onImageFileListChange(updatedFileList);
+    if (updatedFileList.length === 0) {
+      onImageFileRemoved();
+    }
   };
 
   const handlePreviewImage = (file: File | null) => {
@@ -29,12 +37,12 @@ export default function UploadImage({ initialImageFileList, onImageFileListChang
             url: reader.result as string,
           },
         ];
-        setFileList(newFileList);
+        setImageFileList(newFileList);
         onImageFileListChange(newFileList);
       };
       reader.readAsDataURL(file);
     } else {
-      setFileList([]);
+      setImageFileList([]);
       onImageFileListChange([]);
     }
   };
@@ -59,7 +67,7 @@ export default function UploadImage({ initialImageFileList, onImageFileListChang
       }}
       onRemove={handleRemove}
       beforeUpload={handleBeforeUpload}
-      fileList={fileList}
+      fileList={imageFileList}
     >
       <div>
         <PlusOutlined />

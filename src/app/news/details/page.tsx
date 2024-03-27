@@ -16,6 +16,7 @@ export default function NewsDetailsPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
   const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
+  const [imageFileRemoved, setImageFileRemoved] = useState(false);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -40,6 +41,7 @@ export default function NewsDetailsPage() {
               ]
             : []
         );
+        setImageFileRemoved(!news.image_b64);
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
@@ -51,11 +53,17 @@ export default function NewsDetailsPage() {
     setImageFileList(newImageFileList);
   };
 
+  const handleImageFileRemoved = () => {
+    setImageFileRemoved(true);
+  };
+
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      let image_b64 = '';
+      let image_b64 = undefined;
       if (imageFileList.length > 0 && imageFileList[0].url) {
         image_b64 = imageFileList[0].url.split(',')[1];
+      } else if (imageFileRemoved) {
+        image_b64 = '';
       }
       const updatedNews: NewsRecord = {
         ...values,
@@ -130,7 +138,11 @@ export default function NewsDetailsPage() {
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
             <Input.TextArea rows={6} />
           </Form.Item>
-          <UploadImage initialImageFileList={imageFileList} onImageFileListChange={handleImageFileListChange} />
+          <UploadImage
+            initialImageFileList={imageFileList}
+            onImageFileListChange={handleImageFileListChange}
+            onImageFileRemoved={handleImageFileRemoved}
+          />
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
               更新
