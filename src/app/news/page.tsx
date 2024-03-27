@@ -18,7 +18,7 @@ export default function NewsListPage() {
       const headerHeight = tableContainer.offsetTop;
       const remainingHeight = window.innerHeight - headerHeight;
       tableContainer.style.height = `${remainingHeight}px`;
-      setTableRowsHeight(window.innerHeight - headerHeight - 120);
+      setTableRowsHeight(window.innerHeight - headerHeight - 145);
     }
   }, []);
 
@@ -69,6 +69,7 @@ export default function NewsListPage() {
       title: '説明',
       dataIndex: 'description',
       key: 'description',
+      render: (text: string) => <div title={text}>{text.length > 100 ? `${text.slice(0, 100)}...` : text}</div>,
     },
     {
       width: '20%',
