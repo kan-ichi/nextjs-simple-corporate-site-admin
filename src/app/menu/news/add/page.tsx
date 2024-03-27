@@ -17,6 +17,11 @@ export default function AddNewsPage() {
     setImageFileList(newImageFileList);
   };
 
+  const handleCropImageComplete = (croppedAreaPixels: { width: number; height: number }) => {
+    // トリミングされた画像の縦横サイズを使った処理を行う
+    console.log(`Cropped image size: ${croppedAreaPixels.width} x ${croppedAreaPixels.height} pixels`);
+  };
+
   const handleSubmit = async (values: News) => {
     let image_b64 = undefined;
     if (imageFileList.length > 0 && imageFileList[0].url) {
@@ -82,6 +87,7 @@ export default function AddNewsPage() {
           initialImageFileList={imageFileList}
           onImageFileListChange={handleImageFileListChange}
           onImageFileRemoved={() => {}}
+          onCropImageComplete={handleCropImageComplete}
         />
         <Form.Item>
           <Button type="primary" htmlType="submit">

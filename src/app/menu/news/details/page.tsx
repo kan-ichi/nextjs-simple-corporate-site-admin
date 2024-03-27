@@ -58,6 +58,11 @@ export default function NewsDetailsPage() {
     setImageFileRemoved(true);
   };
 
+  const handleCropImageComplete = (croppedAreaPixels: { width: number; height: number }) => {
+    // トリミングされた画像の縦横サイズを使った処理を行う
+    console.log(`Cropped image size: ${croppedAreaPixels.width} x ${croppedAreaPixels.height} pixels`);
+  };
+
   const handleUpdate = async (values: NewsRecord) => {
     try {
       let image_b64 = undefined;
@@ -153,6 +158,7 @@ export default function NewsDetailsPage() {
             initialImageFileList={imageFileList}
             onImageFileListChange={handleImageFileListChange}
             onImageFileRemoved={handleImageFileRemoved}
+            onCropImageComplete={handleCropImageComplete}
           />
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
