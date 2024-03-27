@@ -1,13 +1,13 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
+import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input, Popconfirm, Upload, message } from 'antd';
+import { Button, DatePicker, Form, Input, Popconfirm, message } from 'antd';
 import locale from 'antd/es/date-picker/locale/ja_JP';
+import { UploadFile } from 'antd/lib/upload/interface';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { UploadFile } from 'antd/lib/upload/interface';
 
 export default function NewsDetailsPage() {
   const [form] = Form.useForm();
@@ -15,9 +15,7 @@ export default function NewsDetailsPage() {
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
-  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
   const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
-  const [removeImageFile, setRemoveImageFile] = useState<UploadFile | null>(null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -49,42 +47,15 @@ export default function NewsDetailsPage() {
     fetchNewsData();
   }, []);
 
-  const handlePreviewImage = (file: File | null) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImageFileList([
-          {
-            uid: '-1',
-            name: file.name,
-            status: 'done',
-            url: reader.result as string,
-          },
-        ]);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImageFileList([]);
-    }
-  };
-
-  useEffect(() => {
-    handlePreviewImage(uploadedImageFile);
-  }, [uploadedImageFile]);
-
-  const handleRemoveImage = (file: UploadFile) => {
-    setImageFileList([]);
-    setUploadedImageFile(null);
-    setRemoveImageFile(file);
+  const handleImageFileListChange = (newImageFileList: UploadFile[]) => {
+    setImageFileList(newImageFileList);
   };
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      let image_b64 = undefined;
+      let image_b64 = '';
       if (imageFileList.length > 0 && imageFileList[0].url) {
         image_b64 = imageFileList[0].url.split(',')[1];
-      } else if (removeImageFile) {
-        image_b64 = '';
       }
       const updatedNews: NewsRecord = {
         ...values,
@@ -159,42 +130,7 @@ export default function NewsDetailsPage() {
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
             <Input.TextArea rows={6} />
           </Form.Item>
-          <Upload
-            listType="picture-card"
-            maxCount={1}
-            showUploadList={{
-              showPreviewIcon: true,
-              showRemoveIcon: true,
-              showDownloadIcon: true,
-            }}
-            onRemove={handleRemoveImage}
-            beforeUpload={(file) => {
-              const isValidType = file.type.startsWith('image/');
-              if (!isValidType) {
-                message.error('画像ファイルを選択してください');
-              } else {
-                setUploadedImageFile(file);
-              }
-              return isValidType || Upload.LIST_IGNORE;
-            }}
-            onChange={(info) => {
-              if (info.file.status === 'uploading') {
-                // uploading...
-              }
-              if (info.file.status === 'done') {
-                // upload success
-              }
-              if (info.file.status === 'error') {
-                message.error('アップロードに失敗しました');
-              }
-            }}
-            fileList={imageFileList}
-          >
-            <div>
-              <PlusOutlined />
-              <div style={{ marginTop: 8 }}>画像をアップロード</div>
-            </div>
-          </Upload>
+          <UploadImage initialImageFileList={imageFileList} onImageFileListChange={handleImageFileListChange} />
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
               更新
