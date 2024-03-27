@@ -7,6 +7,7 @@ import locale from 'antd/es/date-picker/locale/ja_JP';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { UploadFile } from 'antd/lib/upload/interface';
 
 export default function NewsDetailsPage() {
   const [form] = Form.useForm();
@@ -15,7 +16,7 @@ export default function NewsDetailsPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(newsData?.image_b64 || null);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -28,13 +29,47 @@ export default function NewsDetailsPage() {
         }
         setNewsData(news);
         form.setFieldsValue(news);
-        setPreviewImage(news.image_b64 || null);
+        setFileList(
+          news.image_b64
+            ? [
+                {
+                  uid: '-1',
+                  name: 'preview.png',
+                  status: 'done',
+                  url: `data:image/png;base64,${news.image_b64}`,
+                },
+              ]
+            : []
+        );
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
     };
     fetchNewsData();
   }, []);
+
+  const handlePreviewImage = (file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFileList([
+          {
+            uid: '-1',
+            name: file.name,
+            status: 'done',
+            url: reader.result as string,
+          },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFileList([]);
+    }
+  };
+
+  useEffect(() => {
+    handlePreviewImage(uploadedFile);
+  }, [uploadedFile]);
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
@@ -160,18 +195,7 @@ export default function NewsDetailsPage() {
                 message.error('アップロードに失敗しました');
               }
             }}
-            fileList={
-              previewImage
-                ? [
-                    {
-                      uid: '-1',
-                      name: 'preview.png',
-                      status: 'done',
-                      url: `data:image/png;base64,${previewImage}`,
-                    },
-                  ]
-                : []
-            }
+            fileList={fileList}
           >
             <div>
               <PlusOutlined />
