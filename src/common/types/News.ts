@@ -9,7 +9,7 @@ export interface News {
   title: string;
   description: string;
   content: string;
-  image_id?: string;
+  image_b64?: string;
   category?: CategoryRecord;
 }
 

@@ -14,7 +14,7 @@ export default function NewsDetailsPage() {
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -36,28 +36,15 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      // const { fileList } = (values as any).image || {};
-      // let base64Image: string | undefined;
-
-      // console.log(fileList);
-
-      // if (fileList && fileList.length > 0) {
-      //   const file = fileList[0].originFileObj;
-      //   if (file) {
-      //     base64Image = await convertToBase64(file);
-      //   }
-      // }
-      // const fileList = (values as any).image[0].thumbUrl;
-      // const base64Image = previewImage ?? (await convertToBase64(previewImage));
-
-      console.log(previewImage);
-
+      let image_b64 = newsData?.image_b64 || '';
+      if (uploadedFile) {
+        image_b64 = await convertToBase64(uploadedFile);
+      }
       const updatedNews: NewsRecord = {
         ...values,
         id,
-        image_id: previewImage ?? values.image_id,
+        image_b64,
       };
-
       await DalNews.updateNews(updatedNews);
       message.success('ニュースが正常に更新されました');
       router.push('/news');
@@ -143,23 +130,9 @@ export default function NewsDetailsPage() {
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
             <Input.TextArea rows={6} />
           </Form.Item>
-          {/* <Form.Item
-            name="image"
-            label="画像"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => {
-              if (Array.isArray(e)) {
-                return e;
-              }
-              return e?.fileList;
-            }}
-          > */}
           <Upload
-            // name="image"
             listType="picture-card"
-            // listType="picture"
             maxCount={1}
-            // showUploadList={false}
             showUploadList={{
               showPreviewIcon: true,
               showRemoveIcon: true,
@@ -170,7 +143,7 @@ export default function NewsDetailsPage() {
               if (!isValidType) {
                 message.error('画像ファイルを選択してください');
               } else {
-                setPreviewImage(URL.createObjectURL(file));
+                setUploadedFile(file);
               }
               return isValidType || Upload.LIST_IGNORE;
             }}
@@ -186,16 +159,11 @@ export default function NewsDetailsPage() {
               }
             }}
           >
-            {/* {previewImage ? (
-                <img src={previewImage} alt="preview" style={{ maxWidth: '100%', maxHeight: 300 }} />
-              ) : ( */}
             <div>
               <PlusOutlined />
               <div style={{ marginTop: 8 }}>画像をアップロード</div>
             </div>
-            {/* )} */}
           </Upload>
-          {/* </Form.Item> */}
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
               更新
