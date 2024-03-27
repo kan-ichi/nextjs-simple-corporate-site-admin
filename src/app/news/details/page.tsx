@@ -15,6 +15,7 @@ export default function NewsDetailsPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(newsData?.image_b64 || null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -27,6 +28,7 @@ export default function NewsDetailsPage() {
         }
         setNewsData(news);
         form.setFieldsValue(news);
+        setPreviewImage(news.image_b64 || null);
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
@@ -158,6 +160,18 @@ export default function NewsDetailsPage() {
                 message.error('アップロードに失敗しました');
               }
             }}
+            fileList={
+              previewImage
+                ? [
+                    {
+                      uid: '-1',
+                      name: 'preview.png',
+                      status: 'done',
+                      url: `data:image/png;base64,${previewImage}`,
+                    },
+                  ]
+                : []
+            }
           >
             <div>
               <PlusOutlined />
