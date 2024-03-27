@@ -1,18 +1,29 @@
 'use client';
 import { News } from '@/common/types/News';
+import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
-import { Button, DatePicker, Form, Input, message } from 'antd';
+import { Button, DatePicker, Form, Input, UploadFile, message } from 'antd';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function AddNewsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
+  const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
+
+  const handleImageFileListChange = (newImageFileList: UploadFile[]) => {
+    setImageFileList(newImageFileList);
+  };
 
   const handleSubmit = async (values: News) => {
+    let image_b64 = undefined;
+    if (imageFileList.length > 0 && imageFileList[0].url) {
+      image_b64 = imageFileList[0].url.split(',')[1];
+    }
     try {
-      await DalNews.addNews(values);
+      await DalNews.addNews(image_b64 ? { ...values, image_b64 } : values);
       message.success('ニュースが正常に登録されました');
       form.resetFields();
       router.push('/news');
@@ -68,6 +79,11 @@ export default function AddNewsPage() {
         <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
           <Input.TextArea rows={6} />
         </Form.Item>
+        <UploadImage
+          initialImageFileList={imageFileList}
+          onImageFileListChange={handleImageFileListChange}
+          onImageFileRemoved={() => {}}
+        />
         <Form.Item>
           <Button type="primary" htmlType="submit">
             登録
