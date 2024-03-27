@@ -18,7 +18,7 @@ export default function NewsListPage() {
       const headerHeight = tableContainer.offsetTop;
       const remainingHeight = window.innerHeight - headerHeight;
       tableContainer.style.height = `${remainingHeight}px`;
-      setTableRowsHeight(window.innerHeight - headerHeight - 145);
+      setTableRowsHeight(window.innerHeight - headerHeight - 120);
     }
   }, []);
 
@@ -77,7 +77,7 @@ export default function NewsListPage() {
       key: 'action',
       render: (text: string, record: NewsRecord) => (
         <>
-          <Button className="mr-2" type="primary" onClick={() => router.push(`/news/details?id=${record.id}`)}>
+          <Button className="mr-2" type="primary" onClick={() => router.push(`/menu/news/details?id=${record.id}`)}>
             詳細表示・編集
           </Button>
           <Popconfirm
@@ -97,7 +97,7 @@ export default function NewsListPage() {
     <div className="min-h-screen grid grid-rows-[auto_1fr]">
       <div className="mb-1 flex justify-between items-center">
         <h1 className="text-3xl font-bold ml-10">ニュース</h1>
-        <Button className="align-middle mr-10" type="primary" onClick={() => router.push('/news/add')}>
+        <Button className="align-middle mr-10" type="primary" onClick={() => router.push('/menu/news/add')}>
           新規ニュース登録
         </Button>
       </div>

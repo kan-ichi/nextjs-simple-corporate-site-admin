@@ -24,7 +24,7 @@ export default function NewsDetailsPage() {
         const news = await DalNews.getNewsById(id);
         if (!news) {
           message.error('ニュースを取得できません');
-          router.push('/news');
+          router.push('/menu/news');
           return;
         }
         setNewsData(news);
@@ -72,7 +72,7 @@ export default function NewsDetailsPage() {
       };
       await DalNews.updateNews(updatedNews);
       message.success('ニュースが正常に更新されました');
-      router.push('/news');
+      router.push('/menu/news');
     } catch (error) {
       console.error('Failed to update news:', error);
       message.error('ニュースの更新に失敗しました');
@@ -83,7 +83,7 @@ export default function NewsDetailsPage() {
     try {
       await DalNews.deleteNews(id);
       message.success('ニュースが正常に削除されました');
-      router.push('/news');
+      router.push('/menu/news');
     } catch (error) {
       console.error('Failed to delete news:', error);
       message.error('ニュースの削除に失敗しました');
@@ -151,7 +151,7 @@ export default function NewsDetailsPage() {
                 削除
               </Button>
             </Popconfirm>
-            <Button className="m-1" onClick={() => router.push('/news')} type="default">
+            <Button className="m-1" onClick={() => router.push('/menu/news')} type="default">
               キャンセル
             </Button>
           </Form.Item>

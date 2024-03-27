@@ -26,7 +26,7 @@ export default function AddNewsPage() {
       await DalNews.addNews(image_b64 ? { ...values, image_b64 } : values);
       message.success('ニュースが正常に登録されました');
       form.resetFields();
-      router.push('/news');
+      router.push('/menu/news');
     } catch (error) {
       console.error('Failed to add news:', error);
       message.error('ニュースの登録に失敗しました');
@@ -87,7 +87,7 @@ export default function AddNewsPage() {
           <Button type="primary" htmlType="submit">
             登録
           </Button>
-          <Button className="ml-2" onClick={() => router.push('/news')} type="default">
+          <Button className="ml-2" onClick={() => router.push('/menu/news')} type="default">
             キャンセル
           </Button>
         </Form.Item>
