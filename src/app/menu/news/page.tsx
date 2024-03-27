@@ -2,7 +2,8 @@
 import { NewsRecord } from '@/common/types/News';
 import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
 import { DalNews } from '@/features/DalNews';
-import { Button, Popconfirm, Table, message } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Modal, Table, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -41,14 +42,25 @@ export default function NewsListPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    try {
-      await DalNews.deleteNews(id);
-      setNewsList(newsList.filter((news) => news.id !== id));
-      message.success('ニュースが正常に削除されました');
-    } catch (error) {
-      console.error('Failed to delete news:', error);
-      message.error('ニュースの削除に失敗しました');
-    }
+    Modal.confirm({
+      title: '本当に削除しますか？',
+      icon: <ExclamationCircleOutlined />,
+      content: '削除すると元に戻すことはできません',
+      okText: 'はい',
+      okType: 'danger',
+      cancelText: 'いいえ',
+      maskClosable: true,
+      onOk: async () => {
+        try {
+          await DalNews.deleteNews(id);
+          setNewsList(newsList.filter((news) => news.id !== id));
+          message.success('ニュースが正常に削除されました');
+        } catch (error) {
+          console.error('Failed to delete news:', error);
+          message.error('ニュースの削除に失敗しました');
+        }
+      },
+    });
   };
 
   const columns = [
@@ -80,14 +92,9 @@ export default function NewsListPage() {
           <Button className="mr-2" type="primary" onClick={() => router.push(`/menu/news/details?id=${record.id}`)}>
             詳細表示・編集
           </Button>
-          <Popconfirm
-            title="本当に削除しますか？"
-            onConfirm={() => handleDelete(record.id)}
-            okText="はい"
-            cancelText="いいえ"
-          >
-            <Button danger>削除</Button>
-          </Popconfirm>
+          <Button danger onClick={() => handleDelete(record.id)}>
+            削除
+          </Button>
         </>
       ),
     },

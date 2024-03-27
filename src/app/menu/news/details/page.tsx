@@ -3,7 +3,8 @@ import { NewsRecord } from '@/common/types/News';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
-import { Button, Form, Input, Popconfirm, message } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, message } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -80,14 +81,25 @@ export default function NewsDetailsPage() {
   };
 
   const handleDelete = async () => {
-    try {
-      await DalNews.deleteNews(id);
-      message.success('ニュースが正常に削除されました');
-      router.push('/menu/news');
-    } catch (error) {
-      console.error('Failed to delete news:', error);
-      message.error('ニュースの削除に失敗しました');
-    }
+    Modal.confirm({
+      title: '本当に削除しますか？',
+      icon: <ExclamationCircleOutlined />,
+      content: '削除すると元に戻すことはできません',
+      okText: 'はい',
+      okType: 'danger',
+      cancelText: 'いいえ',
+      maskClosable: true,
+      onOk: async () => {
+        try {
+          await DalNews.deleteNews(id);
+          message.success('ニュースが正常に削除されました');
+          router.push('/menu/news');
+        } catch (error) {
+          console.error('Failed to delete news:', error);
+          message.error('ニュースの削除に失敗しました');
+        }
+      },
+    });
   };
 
   return (
@@ -146,11 +158,9 @@ export default function NewsDetailsPage() {
             <Button className="m-1" type="primary" htmlType="submit">
               更新
             </Button>
-            <Popconfirm title="本当に削除しますか？" onConfirm={handleDelete} okText="はい" cancelText="いいえ">
-              <Button className="m-1" danger>
-                削除
-              </Button>
-            </Popconfirm>
+            <Button className="m-1" danger onClick={handleDelete}>
+              削除
+            </Button>
             <Button className="m-1" onClick={() => router.push('/menu/news')} type="default">
               キャンセル
             </Button>
