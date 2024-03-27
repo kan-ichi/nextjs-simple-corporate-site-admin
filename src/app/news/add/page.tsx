@@ -1,9 +1,9 @@
 'use client';
 import { News } from '@/common/types/News';
+import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
-import { Button, DatePicker, Form, Input, UploadFile, message } from 'antd';
-import locale from 'antd/es/date-picker/locale/ja_JP';
+import { Button, Form, Input, UploadFile, message } from 'antd';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -62,8 +62,7 @@ export default function AddNewsPage() {
             },
           ]}
         >
-          <DatePicker
-            locale={locale}
+          <DatePickerJapanese
             format="YYYY/MM/DD"
             onChange={(date, dateString) => {
               form.setFieldsValue({ release_date: date ? date.toDate() : null });

@@ -1,9 +1,9 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
+import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
-import { Button, DatePicker, Form, Input, Popconfirm, message } from 'antd';
-import locale from 'antd/es/date-picker/locale/ja_JP';
+import { Button, Form, Input, Popconfirm, message } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -120,8 +120,7 @@ export default function NewsDetailsPage() {
               },
             ]}
           >
-            <DatePicker
-              locale={locale}
+            <DatePickerJapanese
               format="YYYY/MM/DD"
               value={newsData?.release_date ? dayjs(newsData.release_date) : null}
               onChange={(date, dateString) => {
