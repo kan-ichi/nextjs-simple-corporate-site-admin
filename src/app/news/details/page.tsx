@@ -15,9 +15,9 @@ export default function NewsDetailsPage() {
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = searchParams.get('id') as string;
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [removeFile, setRemoveFile] = useState<UploadFile | null>(null);
+  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
+  const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
+  const [removeImageFile, setRemoveImageFile] = useState<UploadFile | null>(null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -30,7 +30,7 @@ export default function NewsDetailsPage() {
         }
         setNewsData(news);
         form.setFieldsValue(news);
-        setFileList(
+        setImageFileList(
           news.image_b64
             ? [
                 {
@@ -53,7 +53,7 @@ export default function NewsDetailsPage() {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setFileList([
+        setImageFileList([
           {
             uid: '-1',
             name: file.name,
@@ -64,26 +64,26 @@ export default function NewsDetailsPage() {
       };
       reader.readAsDataURL(file);
     } else {
-      setFileList([]);
+      setImageFileList([]);
     }
   };
 
   useEffect(() => {
-    handlePreviewImage(uploadedFile);
-  }, [uploadedFile]);
+    handlePreviewImage(uploadedImageFile);
+  }, [uploadedImageFile]);
 
-  const handleRemove = (file: UploadFile) => {
-    setFileList([]);
-    setUploadedFile(null);
-    setRemoveFile(file);
+  const handleRemoveImage = (file: UploadFile) => {
+    setImageFileList([]);
+    setUploadedImageFile(null);
+    setRemoveImageFile(file);
   };
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
       let image_b64 = undefined;
-      if (fileList.length > 0 && fileList[0].url) {
-        image_b64 = fileList[0].url.split(',')[1];
-      } else if (removeFile) {
+      if (imageFileList.length > 0 && imageFileList[0].url) {
+        image_b64 = imageFileList[0].url.split(',')[1];
+      } else if (removeImageFile) {
         image_b64 = '';
       }
       const updatedNews: NewsRecord = {
@@ -99,23 +99,6 @@ export default function NewsDetailsPage() {
       message.error('ニュースの更新に失敗しました');
     }
   };
-
-  // ファイルを Base64 エンコーディングする関数
-  const convertToBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        if (typeof fileReader.result === 'string') {
-          resolve(fileReader.result.split(',')[1]);
-        } else {
-          reject(new Error('Failed to convert file to base64'));
-        }
-      };
-      fileReader.onerror = () => {
-        reject(new Error('Failed to read file'));
-      };
-    });
 
   const handleDelete = async () => {
     try {
@@ -184,13 +167,13 @@ export default function NewsDetailsPage() {
               showRemoveIcon: true,
               showDownloadIcon: true,
             }}
-            onRemove={handleRemove}
+            onRemove={handleRemoveImage}
             beforeUpload={(file) => {
               const isValidType = file.type.startsWith('image/');
               if (!isValidType) {
                 message.error('画像ファイルを選択してください');
               } else {
-                setUploadedFile(file);
+                setUploadedImageFile(file);
               }
               return isValidType || Upload.LIST_IGNORE;
             }}
@@ -205,7 +188,7 @@ export default function NewsDetailsPage() {
                 message.error('アップロードに失敗しました');
               }
             }}
-            fileList={fileList}
+            fileList={imageFileList}
           >
             <div>
               <PlusOutlined />
