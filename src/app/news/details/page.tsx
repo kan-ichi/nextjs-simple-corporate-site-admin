@@ -17,6 +17,7 @@ export default function NewsDetailsPage() {
   const id = searchParams.get('id') as string;
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [removeFile, setRemoveFile] = useState<UploadFile | null>(null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -71,11 +72,19 @@ export default function NewsDetailsPage() {
     handlePreviewImage(uploadedFile);
   }, [uploadedFile]);
 
+  const handleRemove = (file: UploadFile) => {
+    setFileList([]);
+    setUploadedFile(null);
+    setRemoveFile(file);
+  };
+
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      let image_b64 = newsData?.image_b64 || '';
-      if (uploadedFile) {
-        image_b64 = await convertToBase64(uploadedFile);
+      let image_b64 = undefined;
+      if (fileList.length > 0 && fileList[0].url) {
+        image_b64 = fileList[0].url.split(',')[1];
+      } else if (removeFile) {
+        image_b64 = '';
       }
       const updatedNews: NewsRecord = {
         ...values,
@@ -175,6 +184,7 @@ export default function NewsDetailsPage() {
               showRemoveIcon: true,
               showDownloadIcon: true,
             }}
+            onRemove={handleRemove}
             beforeUpload={(file) => {
               const isValidType = file.type.startsWith('image/');
               if (!isValidType) {
