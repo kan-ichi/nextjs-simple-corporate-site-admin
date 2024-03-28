@@ -26,12 +26,11 @@ export module FirebaseStorage {
         (error) => {
           console.error('Error uploading file: ', error);
           throw error;
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          return downloadURL;
         }
       );
+      await uploadTask;
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+      return downloadURL;
     } catch (error) {
       console.error('Error uploading file: ', error);
       throw error;
