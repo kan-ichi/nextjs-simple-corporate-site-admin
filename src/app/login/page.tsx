@@ -14,12 +14,12 @@ export default function Login() {
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-md shadow-md">
         <h2 className="text-2xl font-bold mb-6">ログイン</h2>
-        <Form onFinish={handleLogin}>
+        <Form onFinish={handleLogin} initialValues={{ username: 'admin', password: 'admin' }}>
           <Form.Item name="username" rules={[{ required: true, message: 'ユーザー名を入力してください' }]}>
-            <Input placeholder="ユーザー名" defaultValue="admin" />
+            <Input placeholder="ユーザー名" />
           </Form.Item>
           <Form.Item name="password" rules={[{ required: true, message: 'パスワードを入力してください' }]}>
-            <Input.Password placeholder="パスワード" defaultValue="admin" />
+            <Input.Password placeholder="パスワード" />
           </Form.Item>
           <Button type="primary" htmlType="submit" block>
             ログイン
