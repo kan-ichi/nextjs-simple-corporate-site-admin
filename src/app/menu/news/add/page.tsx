@@ -15,14 +15,6 @@ export default function AddNewsPage() {
   const [isImageFileAdded, setIsImageFileAdded] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  const isImageFileAddedCallback = (value: boolean) => {
-    setIsImageFileAdded(value);
-  };
-
-  const fileUploadedCallback = (value: File | null) => {
-    setUploadedFile(value);
-  };
-
   const handleSubmit = async (values: News) => {
     try {
       const addedRecord = await DalNews.addNews(values);
@@ -83,7 +75,10 @@ export default function AddNewsPage() {
         <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
           <Input.TextArea rows={6} />
         </Form.Item>
-        <UploadImage isImageFileAddedCallback={isImageFileAddedCallback} fileUploadedCallback={fileUploadedCallback} />
+        <UploadImage
+          isImageFileAddedCallback={(value: boolean) => setIsImageFileAdded(value)}
+          fileUploadedCallback={(value: File | null) => setUploadedFile(value)}
+        />
         <Form.Item>
           <Button type="primary" htmlType="submit">
             登録

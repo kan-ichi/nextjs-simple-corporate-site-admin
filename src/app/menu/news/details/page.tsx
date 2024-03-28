@@ -39,18 +39,6 @@ export default function NewsDetailsPage() {
     fetchNewsData();
   }, []);
 
-  const isImageFileAddedCallback = (value: boolean) => {
-    setIsImageFileAdded(value);
-  };
-
-  const isImageFileDeletedCallback = (value: boolean) => {
-    setIsImageFileDeleted(value);
-  };
-
-  const fileUploadedCallback = (value: File | null) => {
-    setUploadedFile(value);
-  };
-
   const handleUpdate = async (values: NewsRecord) => {
     try {
       if (isImageFileAdded && uploadedFile) {
@@ -144,9 +132,9 @@ export default function NewsDetailsPage() {
           </Form.Item>
           <UploadImage
             existingFileName={id}
-            isImageFileAddedCallback={isImageFileAddedCallback}
-            isImageFileDeletedCallback={isImageFileDeletedCallback}
-            fileUploadedCallback={fileUploadedCallback}
+            isImageFileAddedCallback={(value: boolean) => setIsImageFileAdded(value)}
+            isImageFileDeletedCallback={(value: boolean) => setIsImageFileDeleted(value)}
+            fileUploadedCallback={(value: File | null) => setUploadedFile(value)}
           />
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
