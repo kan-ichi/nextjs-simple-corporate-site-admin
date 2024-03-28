@@ -3,6 +3,7 @@ import { NewsRecord } from '@/common/types/News';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
 import { DalNews } from '@/features/DalNews';
+import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Table, message } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -53,6 +54,7 @@ export default function NewsListPage() {
       maskClosable: true,
       onOk: async () => {
         try {
+          FirebaseStorage.deleteImageFile(id);
           await DalNews.deleteNews(id);
           setNewsList(newsList.filter((news) => news.id !== id));
           message.success('ニュースが正常に削除されました');

@@ -9,7 +9,8 @@ export module FirebaseStorage {
    */
   export async function uploadImageFile(file: File, fileName: string): Promise<string> {
     try {
-      const fileRef = ref(getStorage(), `/images/${fileName}`);
+      const storage = getStorage();
+      const fileRef = ref(storage, `/images/${fileName}`);
       // メタデータを設定する
       const metadata = {
         contentType: file.type, // ファイルの種類を指定する
@@ -29,17 +30,18 @@ export module FirebaseStorage {
    * ファイルの URL を Firebase Storage の images ディレクトリから取得します
    */
   export async function getImageFileURL(fileName: string): Promise<string | null> {
-    const fileRef = ref(getStorage(), `/images/${fileName}`);
     try {
+      const storage = getStorage();
+      const fileRef = ref(storage, `/images/${fileName}`);
       return await getDownloadURL(fileRef);
     } catch (error) {
-      // 'any' 型への型アサーションを使用してエラーオブジェクトの型を明示的に指定します。
+      // 'any' 型への型アサーションを使用してエラーオブジェクトの型を明示的に指定
       const errorCode = (error as any).code;
       if (errorCode === 'storage/object-not-found') {
-        // ファイルが存在しない場合、nullを返します。
+        // ファイルが存在しない場合、nullを返す
         return null;
       } else {
-        // その他のエラーの場合、エラーをスローします。
+        // その他のエラーの場合、エラーをスローする
         console.error('Error getting FileURL: ', error);
         throw error;
       }
@@ -51,11 +53,20 @@ export module FirebaseStorage {
    */
   export async function deleteImageFile(fileName: string) {
     try {
-      const fileRef = ref(getStorage(), `/images/${fileName}`);
+      const storage = getStorage();
+      const fileRef = ref(storage, `/images/${fileName}`);
       await deleteObject(fileRef);
     } catch (error) {
-      console.error('Error deleting file: ', error);
-      throw error;
+      // 'any' 型への型アサーションを使用してエラーオブジェクトの型を明示的に指定
+      const errorCode = (error as any).code;
+      if (errorCode === 'storage/object-not-found') {
+        // ファイルが存在しない場合、何もしない
+        return;
+      } else {
+        // その他のエラーの場合、エラーをスローする
+        console.error('Error deleting file: ', error);
+        throw error;
+      }
     }
   }
 }

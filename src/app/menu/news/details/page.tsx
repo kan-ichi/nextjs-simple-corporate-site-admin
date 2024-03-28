@@ -17,7 +17,9 @@ export default function NewsDetailsPage() {
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
-  const [isImageFileExist, setIsImageFileExist] = useState(true);
+  const [isImageFileAdded, setIsImageFileAdded] = useState(false);
+  const [isImageFileDeleted, setIsImageFileDeleted] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -37,13 +39,24 @@ export default function NewsDetailsPage() {
     fetchNewsData();
   }, []);
 
-  const isImageFileExistCallback = (isExist: boolean) => {
-    setIsImageFileExist(isExist);
+  const isImageFileAddedCallback = (value: boolean) => {
+    setIsImageFileAdded(value);
+  };
+
+  const isImageFileDeletedCallback = (value: boolean) => {
+    setIsImageFileDeleted(value);
+  };
+
+  const fileUploadedCallback = (value: File | null) => {
+    setUploadedFile(value);
   };
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      if (!isImageFileExist) {
+      if (isImageFileAdded && uploadedFile) {
+        FirebaseStorage.uploadImageFile(uploadedFile, id);
+      }
+      if (isImageFileDeleted) {
         FirebaseStorage.deleteImageFile(id);
       }
       const updatedNews: NewsRecord = {
@@ -129,7 +142,12 @@ export default function NewsDetailsPage() {
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
             <Input.TextArea rows={6} />
           </Form.Item>
-          <UploadImage fileName={id} isImageFileExistCallback={isImageFileExistCallback} />
+          <UploadImage
+            existingFileName={id}
+            isImageFileAddedCallback={isImageFileAddedCallback}
+            isImageFileDeletedCallback={isImageFileDeletedCallback}
+            fileUploadedCallback={fileUploadedCallback}
+          />
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
               更新

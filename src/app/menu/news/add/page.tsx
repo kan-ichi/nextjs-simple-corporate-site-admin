@@ -3,7 +3,8 @@ import { News } from '@/common/types/News';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
-import { Button, Form, Input, UploadFile, message } from 'antd';
+import { FirebaseStorage } from '@/features/FirebaseStorage';
+import { Button, Form, Input, message } from 'antd';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -11,19 +12,23 @@ import { useState } from 'react';
 export default function AddNewsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
-  const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
+  const [isImageFileAdded, setIsImageFileAdded] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  const handleImageFileListChange = (newImageFileList: UploadFile[]) => {
-    setImageFileList(newImageFileList);
+  const isImageFileAddedCallback = (value: boolean) => {
+    setIsImageFileAdded(value);
+  };
+
+  const fileUploadedCallback = (value: File | null) => {
+    setUploadedFile(value);
   };
 
   const handleSubmit = async (values: News) => {
-    let image_b64 = undefined;
-    if (imageFileList.length > 0 && imageFileList[0].url) {
-      image_b64 = imageFileList[0].url.split(',')[1];
-    }
     try {
-      await DalNews.addNews(image_b64 ? { ...values, image_b64 } : values);
+      const addedRecord = await DalNews.addNews(values);
+      if (isImageFileAdded && uploadedFile) {
+        FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
+      }
       message.success('ニュースが正常に登録されました');
       form.resetFields();
       router.push('/menu/news');
@@ -78,11 +83,7 @@ export default function AddNewsPage() {
         <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
           <Input.TextArea rows={6} />
         </Form.Item>
-        <UploadImage
-          initialImageFileList={imageFileList}
-          onImageFileListChange={handleImageFileListChange}
-          onImageFileRemoved={() => {}}
-        />
+        <UploadImage isImageFileAddedCallback={isImageFileAddedCallback} fileUploadedCallback={fileUploadedCallback} />
         <Form.Item>
           <Button type="primary" htmlType="submit">
             登録
