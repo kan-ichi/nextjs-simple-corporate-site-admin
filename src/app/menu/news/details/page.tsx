@@ -4,9 +4,10 @@ import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
+import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, message } from 'antd';
-import { UploadFile } from 'antd/lib/upload/interface';
+import { RcFile, UploadFile } from 'antd/lib/upload';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -31,25 +32,38 @@ export default function NewsDetailsPage() {
         }
         setNewsData(news);
         form.setFieldsValue(news);
-        setImageFileList(
-          news.image_b64
-            ? [
-                {
-                  uid: '-1',
-                  name: 'preview.png',
-                  status: 'done',
-                  url: `data:image/png;base64,${news.image_b64}`,
-                },
-              ]
-            : []
-        );
-        setImageFileRemoved(!news.image_b64);
+        const file = await FirebaseStorage.getImageFile(id);
+        if (file) {
+          const rcFile = createRcFile(file);
+          setImageFileList([
+            {
+              uid: '-1',
+              name: 'preview.png',
+              status: 'done',
+              originFileObj: rcFile,
+            },
+          ]);
+          setImageFileRemoved(false);
+        } else {
+          setImageFileList([]);
+          setImageFileRemoved(true);
+        }
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
     };
     fetchNewsData();
   }, []);
+
+  function createRcFile(file: File): RcFile {
+    const rcFile: RcFile = {
+      ...file,
+      uid: '-1',
+      lastModifiedDate: new Date(),
+    };
+
+    return rcFile;
+  }
 
   const handleImageFileListChange = (newImageFileList: UploadFile[]) => {
     setImageFileList(newImageFileList);
@@ -61,16 +75,15 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      let image_b64 = undefined;
       if (imageFileList.length > 0 && imageFileList[0].url) {
-        image_b64 = imageFileList[0].url.split(',')[1];
+        const file = createFileFromBase64(imageFileList[0].url);
+        await FirebaseStorage.uploadImageFile(file, id);
       } else if (imageFileRemoved) {
-        image_b64 = '';
+        await FirebaseStorage.deleteImageFile(id);
       }
       const updatedNews: NewsRecord = {
         ...values,
         id,
-        image_b64,
       };
       await DalNews.updateNews(updatedNews);
       message.success('ニュースが正常に更新されました');
@@ -80,6 +93,15 @@ export default function NewsDetailsPage() {
       message.error('ニュースの更新に失敗しました');
     }
   };
+
+  function createFileFromBase64(base64String: string): File {
+    const binaryString = window.atob(base64String.split(',')[1]);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new File([bytes], 'image.png', { type: 'image/png' });
+  }
 
   const handleDelete = async () => {
     Modal.confirm({
@@ -151,6 +173,7 @@ export default function NewsDetailsPage() {
             <Input.TextArea rows={6} />
           </Form.Item>
           <UploadImage
+            id={id}
             initialImageFileList={imageFileList}
             onImageFileListChange={handleImageFileListChange}
             onImageFileRemoved={handleImageFileRemoved}
