@@ -49,4 +49,35 @@ export module DbKeyUtils {
       return null;
     }
   }
+
+  /**
+   * DBキーを62進数に変換します
+   */
+  export function convertDbKeyToBase62(hex: string): string {
+    let decimalValue = BigInt('0x' + hex);
+    const base62Chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    const BASE_62 = BigInt(62);
+    const BIGINT_ZERO = BigInt(0);
+    do {
+      result = base62Chars[Number(decimalValue % BASE_62)] + result;
+      decimalValue /= BASE_62;
+    } while (decimalValue > BIGINT_ZERO);
+    return result;
+  }
+
+  /**
+   * 62進数をDBキーに変換します
+   */
+  export function convertBase62ToDbKey(base62: string): string {
+    const base62Chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let decimalValue = BigInt(0);
+    const BASE_62 = BigInt(62);
+    for (let i = 0; i < base62.length; i++) {
+      const char = base62[i];
+      const charValue = BigInt(base62Chars.indexOf(char));
+      decimalValue = decimalValue * BASE_62 + charValue;
+    }
+    return decimalValue.toString(16);
+  }
 }

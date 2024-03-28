@@ -1,5 +1,6 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
+import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
 import { DalNews } from '@/features/DalNews';
@@ -15,7 +16,7 @@ export default function NewsDetailsPage() {
   const router = useRouter();
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
-  const id = searchParams.get('id') as string;
+  const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
   const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
   const [imageFileRemoved, setImageFileRemoved] = useState(false);
 

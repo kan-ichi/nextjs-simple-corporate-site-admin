@@ -1,5 +1,6 @@
 'use client';
 import { NewsRecord } from '@/common/types/News';
+import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
 import { DalNews } from '@/features/DalNews';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -89,7 +90,11 @@ export default function NewsListPage() {
       key: 'action',
       render: (text: string, record: NewsRecord) => (
         <>
-          <Button className="mr-2" type="primary" onClick={() => router.push(`/menu/news/details?id=${record.id}`)}>
+          <Button
+            className="mr-2"
+            type="primary"
+            onClick={() => router.push(`/menu/news/details?id=${DbKeyUtils.convertDbKeyToBase62(record.id)}`)}
+          >
             詳細表示・編集
           </Button>
           <Button danger onClick={() => handleDelete(record.id)}>
