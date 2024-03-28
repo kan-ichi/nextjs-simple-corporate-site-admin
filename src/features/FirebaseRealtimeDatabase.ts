@@ -161,6 +161,24 @@ export module FirebaseRealtimeDatabase {
   }
 
   /**
+   * boolean をDB格納可能な文字列に変換します
+   */
+  export function convertBooleanToString(value: boolean): string;
+  export function convertBooleanToString(value: string): string;
+  export function convertBooleanToString(value: boolean | string): string {
+    return value ? 'true' : 'false';
+  }
+  /**
+   * DBでは文字列として格納されていた値を boolean に変換します
+   */
+
+  export function convertStringToBoolean(value: string): boolean;
+  export function convertStringToBoolean(value: boolean): boolean;
+  export function convertStringToBoolean(value: string | boolean): boolean {
+    return value === 'true';
+  }
+
+  /**
    * 文字列が10MB以下であるかを判定します（項目に格納できる最大サイズが10MB）
    */
   export function isWithin10MBLimit(input: string): boolean {

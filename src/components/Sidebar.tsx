@@ -1,8 +1,8 @@
 'use client';
 import {
+  FormOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
-  MenuOutlined,
   MenuUnfoldOutlined,
   NotificationOutlined,
 } from '@ant-design/icons';
@@ -57,9 +57,9 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
             }`}
             title={!collapsed ? 'メニュー' : ''}
           >
-            <Link href="/menu" className="flex items-center px-4 py-2">
-              <MenuOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
-              {!collapsed && <span>メニュー</span>}
+            <Link href="/menu/top_page" className="flex items-center px-4 py-2">
+              <FormOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
+              {!collapsed && <span>トップページ</span>}
             </Link>
           </li>
           <li
