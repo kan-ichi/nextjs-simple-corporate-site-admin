@@ -7,7 +7,6 @@ import { DalNews } from '@/features/DalNews';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, message } from 'antd';
-import { RcFile, UploadFile } from 'antd/lib/upload';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -18,8 +17,7 @@ export default function NewsDetailsPage() {
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
-  const [imageFileList, setImageFileList] = useState<UploadFile[]>([]);
-  const [imageFileRemoved, setImageFileRemoved] = useState(false);
+  const [isImageFileExist, setIsImageFileExist] = useState(true);
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -32,22 +30,6 @@ export default function NewsDetailsPage() {
         }
         setNewsData(news);
         form.setFieldsValue(news);
-        const file = await FirebaseStorage.getImageFile(id);
-        if (file) {
-          const rcFile = createRcFile(file);
-          setImageFileList([
-            {
-              uid: '-1',
-              name: 'preview.png',
-              status: 'done',
-              originFileObj: rcFile,
-            },
-          ]);
-          setImageFileRemoved(false);
-        } else {
-          setImageFileList([]);
-          setImageFileRemoved(true);
-        }
       } catch (error) {
         console.error('Failed to fetch news data:', error);
       }
@@ -55,31 +37,14 @@ export default function NewsDetailsPage() {
     fetchNewsData();
   }, []);
 
-  function createRcFile(file: File): RcFile {
-    const rcFile: RcFile = {
-      ...file,
-      uid: '-1',
-      lastModifiedDate: new Date(),
-    };
-
-    return rcFile;
-  }
-
-  const handleImageFileListChange = (newImageFileList: UploadFile[]) => {
-    setImageFileList(newImageFileList);
-  };
-
-  const handleImageFileRemoved = () => {
-    setImageFileRemoved(true);
+  const isImageFileExistCallback = (isExist: boolean) => {
+    setIsImageFileExist(isExist);
   };
 
   const handleUpdate = async (values: NewsRecord) => {
     try {
-      if (imageFileList.length > 0 && imageFileList[0].url) {
-        const file = createFileFromBase64(imageFileList[0].url);
-        await FirebaseStorage.uploadImageFile(file, id);
-      } else if (imageFileRemoved) {
-        await FirebaseStorage.deleteImageFile(id);
+      if (!isImageFileExist) {
+        FirebaseStorage.deleteImageFile(id);
       }
       const updatedNews: NewsRecord = {
         ...values,
@@ -94,15 +59,6 @@ export default function NewsDetailsPage() {
     }
   };
 
-  function createFileFromBase64(base64String: string): File {
-    const binaryString = window.atob(base64String.split(',')[1]);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return new File([bytes], 'image.png', { type: 'image/png' });
-  }
-
   const handleDelete = async () => {
     Modal.confirm({
       title: '本当に削除しますか？',
@@ -114,6 +70,7 @@ export default function NewsDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
+          FirebaseStorage.deleteImageFile(id);
           await DalNews.deleteNews(id);
           message.success('ニュースが正常に削除されました');
           router.push('/menu/news');
@@ -172,12 +129,7 @@ export default function NewsDetailsPage() {
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '内容を入力してください' }]}>
             <Input.TextArea rows={6} />
           </Form.Item>
-          <UploadImage
-            id={id}
-            initialImageFileList={imageFileList}
-            onImageFileListChange={handleImageFileListChange}
-            onImageFileRemoved={handleImageFileRemoved}
-          />
+          <UploadImage fileName={id} isImageFileExistCallback={isImageFileExistCallback} />
           <Form.Item className="mt-3">
             <Button className="m-1" type="primary" htmlType="submit">
               更新

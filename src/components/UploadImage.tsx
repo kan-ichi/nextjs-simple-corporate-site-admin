@@ -1,49 +1,50 @@
 import { FirebaseRealtimeDatabase } from '@/features/FirebaseRealtimeDatabase';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { PlusOutlined } from '@ant-design/icons';
-import { Modal, Progress, Upload, message } from 'antd';
+import { Modal, Progress, Spin, Upload, message } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useEffect, useState } from 'react';
 
 interface UploadImageProps {
-  id: string;
-  initialImageFileList: UploadFile[];
-  onImageFileListChange: (fileList: UploadFile[]) => void;
-  onImageFileRemoved: () => void;
+  fileName: string;
+  isImageFileExistCallback?: (isExist: boolean) => void;
 }
 
-export default function UploadImage({
-  id,
-  initialImageFileList,
-  onImageFileListChange,
-  onImageFileRemoved,
-}: UploadImageProps) {
-  const [imageFileList, setImageFileList] = useState<UploadFile[]>(initialImageFileList);
-  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+export default function UploadImage({ fileName, isImageFileExistCallback }: UploadImageProps) {
+  const [imageFileList, setImageFileList] = useState<UploadFile[]>(new Array());
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadingProgress, setUploadingProgress] = useState(0);
 
   useEffect(() => {
-    // 既存の画像ファイルのURLを取得
-    FirebaseStorage.getImageFileURL(id)
-      .then(setExistingImageUrl)
-      .catch(() => setExistingImageUrl(null));
-  }, [id]);
+    // 既存の画像ファイルを取得しますS
+    FirebaseStorage.getImageFileURL(fileName).then((url) => {
+      if (url) {
+        setImageFileList([
+          {
+            uid: '-1',
+            name: fileName,
+            status: 'done',
+            url: url,
+          },
+        ]);
+      }
+    });
+  }, [fileName]);
 
+  /**
+   * プレビュー領域から画像ファイルを削除し、削除した旨をコールバック関数に通知します
+   */
   const handleRemove = (file: UploadFile) => {
     const updatedFileList = imageFileList.filter((f) => f.uid !== file.uid);
     if (updatedFileList.length === 0) {
-      // 既存の画像ファイルを削除
-      FirebaseStorage.deleteImageFile(id);
-      setExistingImageUrl(null);
+      isImageFileExistCallback?.(false);
     }
     setImageFileList(updatedFileList);
-    onImageFileListChange(updatedFileList);
-    if (updatedFileList.length === 0) {
-      onImageFileRemoved();
-    }
   };
 
+  /**
+   * 画像をプレビュー領域に表示します
+   */
   const handlePreviewImage = (file: File | null) => {
     if (file) {
       const reader = new FileReader();
@@ -57,15 +58,16 @@ export default function UploadImage({
           },
         ];
         setImageFileList(newFileList);
-        onImageFileListChange(newFileList);
       };
       reader.readAsDataURL(file);
     } else {
       setImageFileList([]);
-      onImageFileListChange([]);
     }
   };
 
+  /**
+   * 画像をアップロードし、アップロードした画像をプレビュー領域に表示します
+   */
   const handleBeforeUpload = (file: File) => {
     const isValidType = file.type.startsWith('image/');
     if (!isValidType) {
@@ -84,22 +86,8 @@ export default function UploadImage({
         return Upload.LIST_IGNORE;
       } else {
         setUploading(true);
-        // FirebaseStorage.uploadImageFile(file, id)
-        //   .on('state_changed', (snapshot) => {
-        //     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        //     setUploadProgress(progress);
-        //   })
-        //   .then(() => {
-        //     setUploading(false);
-        //     setUploadProgress(0);
-        //     getImageFileURL(id).then(setExistingImageUrl);
-        //   })
-        //   .catch((error) => {
-        //     setUploading(false);
-        //     setUploadProgress(0);
-        //     console.error('Upload failed:', error);
-        //   });
-        await FirebaseStorage.uploadImageFile(file, id);
+        const result = await FirebaseStorage.uploadImageFile(file, fileName);
+        setUploadingProgress(result.progress);
         setUploading(false);
         handlePreviewImage(file);
       }
@@ -121,10 +109,8 @@ export default function UploadImage({
       beforeUpload={handleBeforeUpload}
       fileList={imageFileList}
     >
-      {existingImageUrl ? (
-        <img src={existingImageUrl} alt="Existing Image" style={{ maxWidth: '100%' }} />
-      ) : uploading ? (
-        <Progress type="circle" percent={uploadProgress} />
+      {uploading ? (
+        <Progress percent={uploadingProgress} />
       ) : (
         <div>
           <PlusOutlined />
