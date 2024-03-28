@@ -1,4 +1,4 @@
-import { StorageError, deleteObject, getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 
 /**
  * Firebase Storage 関連の機能
@@ -7,31 +7,22 @@ export module FirebaseStorage {
   /**
    * ファイルを Firebase Storage の images ディレクトリにアップロードします
    */
-  export function uploadImageFile(file: File, fileName: string): Promise<{ downloadURL: string; progress: number }> {
-    return new Promise((resolve, reject) => {
+  export async function uploadImageFile(file: File, fileName: string): Promise<string> {
+    try {
       const fileRef = ref(getStorage(), `/images/${fileName}`);
+      // メタデータを設定する
       const metadata = {
-        contentType: file.type,
+        contentType: file.type, // ファイルの種類を指定する
       };
+      // ファイルのアップロードとメタデータの設定を同時に行う
       const uploadTask = uploadBytesResumable(fileRef, file, metadata);
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          if (snapshot.state === 'running') {
-            resolve({ downloadURL: '', progress });
-          }
-        },
-        (error) => {
-          console.error('Error uploading file: ', error);
-          reject(error);
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve({ downloadURL, progress: 100 });
-        }
-      );
-    });
+      await uploadTask;
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading file: ', error);
+      throw error;
+    }
   }
 
   /**

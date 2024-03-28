@@ -1,7 +1,7 @@
 import { FirebaseRealtimeDatabase } from '@/features/FirebaseRealtimeDatabase';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { PlusOutlined } from '@ant-design/icons';
-import { Modal, Progress, Spin, Upload, message } from 'antd';
+import { Modal, Spin, Upload, message } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useEffect, useState } from 'react';
 
@@ -13,7 +13,6 @@ interface UploadImageProps {
 export default function UploadImage({ fileName, isImageFileExistCallback }: UploadImageProps) {
   const [imageFileList, setImageFileList] = useState<UploadFile[]>(new Array());
   const [uploading, setUploading] = useState(false);
-  const [uploadingProgress, setUploadingProgress] = useState(0);
 
   useEffect(() => {
     // 既存の画像ファイルを取得しますS
@@ -86,8 +85,7 @@ export default function UploadImage({ fileName, isImageFileExistCallback }: Uplo
         return Upload.LIST_IGNORE;
       } else {
         setUploading(true);
-        const result = await FirebaseStorage.uploadImageFile(file, fileName);
-        setUploadingProgress(result.progress);
+        await FirebaseStorage.uploadImageFile(file, fileName);
         setUploading(false);
         handlePreviewImage(file);
       }
@@ -110,7 +108,7 @@ export default function UploadImage({ fileName, isImageFileExistCallback }: Uplo
       fileList={imageFileList}
     >
       {uploading ? (
-        <Progress percent={uploadingProgress} />
+        <Spin size="large" />
       ) : (
         <div>
           <PlusOutlined />
