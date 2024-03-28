@@ -159,4 +159,14 @@ export module FirebaseRealtimeDatabase {
     }
     return dateTimeString.replaceAll('/', '-');
   }
+
+  /**
+   * 文字列が10MB以下であるかを判定します（項目に格納できる最大サイズが10MB）
+   */
+  export function isWithin10MBLimit(input: string): boolean {
+    // 文字列をUTF-8バイト配列にエンコード
+    const utf8Bytes = new TextEncoder().encode(input);
+    // UTF-8バイト配列の長さが10MB以下であるかを判定
+    return utf8Bytes.length <= 10485760; // 10MB (10485760 bytes)
+  }
 }

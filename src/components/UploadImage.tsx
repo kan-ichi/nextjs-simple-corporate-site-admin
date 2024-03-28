@@ -1,5 +1,6 @@
+import { FirebaseRealtimeDatabase } from '@/features/FirebaseRealtimeDatabase';
 import { PlusOutlined } from '@ant-design/icons';
-import { Upload, message } from 'antd';
+import { Modal, Upload, message } from 'antd';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useState } from 'react';
 
@@ -51,10 +52,25 @@ export default function UploadImage({
     const isValidType = file.type.startsWith('image/');
     if (!isValidType) {
       message.error('画像ファイルを選択してください');
-    } else {
-      handlePreviewImage(file);
+      return isValidType || Upload.LIST_IGNORE;
     }
-    return isValidType || Upload.LIST_IGNORE;
+
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      const base64String = fileReader.result as string;
+      if (!FirebaseRealtimeDatabase.isWithin10MBLimit(base64String)) {
+        Modal.error({
+          title: 'エラー',
+          content: '画像サイズが10MB以上のため、アップロードできません。',
+        });
+        return Upload.LIST_IGNORE; // Base64エンコーディングが完了したら処理を終了
+      } else {
+        handlePreviewImage(file); // 10MB以下の場合のみhandlePreviewImageを呼び出す
+      }
+    };
+    fileReader.readAsDataURL(file);
+
+    return Upload.LIST_IGNORE; // FileReaderの処理が完了するまで待機
   };
 
   return (
