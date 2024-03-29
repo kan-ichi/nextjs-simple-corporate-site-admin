@@ -1,20 +1,32 @@
 'use client';
+import { CategoryRecord } from '@/common/types/Category';
 import { News } from '@/common/types/News';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
+import { DalCategory } from '@/features/DalCategory';
 import { DalNews } from '@/features/DalNews';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, Select, message } from 'antd';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+const { Option } = Select;
 
 export default function AddNewsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [categoryRecords, setCategoryRecords] = useState<CategoryRecord[]>([]);
   const [isImageFileAdded, setIsImageFileAdded] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const fetchedCategories = await DalCategory.getAllCategory();
+      setCategoryRecords(fetchedCategories);
+    };
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (values: News) => {
     setIsLoading(true);
@@ -68,6 +80,16 @@ export default function AddNewsPage() {
               form.setFieldsValue({ release_date: date ? date.toDate() : null });
             }}
           />
+        </Form.Item>
+        <Form.Item name="category_id" label="カテゴリー">
+          <Select>
+            <Option value="">（選択してください）</Option>
+            {categoryRecords.map((category) => (
+              <Option key={category.id} value={category.id}>
+                {category.name}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
         <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
           <Input />

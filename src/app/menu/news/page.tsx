@@ -1,7 +1,9 @@
 'use client';
+import { CategoryRecord } from '@/common/types/Category';
 import { NewsRecord } from '@/common/types/News';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
+import { DalCategory } from '@/features/DalCategory';
 import { DalNews } from '@/features/DalNews';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -14,6 +16,7 @@ export default function NewsListPage() {
   const [newsList, setNewsList] = useState<NewsRecord[]>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [tableRowsHeight, setTableRowsHeight] = useState(0);
+  const [categoryRecords, setCategoryRecords] = useState<CategoryRecord[]>([]);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -25,7 +28,12 @@ export default function NewsListPage() {
         console.error('Failed to fetch news:', error);
       }
     };
+    const fetchCategories = async () => {
+      const fetchedCategories = await DalCategory.getAllCategory();
+      setCategoryRecords(fetchedCategories);
+    };
     fetchNews();
+    fetchCategories();
   }, []);
 
   const handleResize = useCallback(() => {
@@ -73,13 +81,22 @@ export default function NewsListPage() {
       title: 'リリース日',
       key: 'date',
       align: 'center' as const,
-      render: (text: string, record: NewsRecord) => <>{FormatDateUtils.yyyyMMdd(record.release_date)}</>,
+      render: (text: string, record: NewsRecord) => <> {FormatDateUtils.yyyyMMdd(record.release_date)}</>,
     },
     {
       width: '30%',
       title: 'タイトル',
       dataIndex: 'title',
       key: 'title',
+      render: (text: string, record: NewsRecord) => (
+        <>
+          {categoryRecords.find((category) => category.id === record.category_id)?.name
+            ? `［${categoryRecords.find((category) => category.id === record.category_id)?.name}］`
+            : ''}
+          <br />
+          {text}
+        </>
+      ),
     },
     {
       title: '説明',

@@ -1,20 +1,24 @@
 'use client';
+import { CategoryRecord } from '@/common/types/Category';
 import { NewsRecord } from '@/common/types/News';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
 import UploadImage from '@/components/UploadImage';
+import { DalCategory } from '@/features/DalCategory';
 import { DalNews } from '@/features/DalNews';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Modal, message } from 'antd';
+import { Button, Form, Input, Modal, Select, message } from 'antd';
 import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+const { Option } = Select;
 
 export default function NewsDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [categoryRecords, setCategoryRecords] = useState<CategoryRecord[]>([]);
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
@@ -37,7 +41,12 @@ export default function NewsDetailsPage() {
         console.error('Failed to fetch news data:', error);
       }
     };
+    const fetchCategories = async () => {
+      const fetchedCategories = await DalCategory.getAllCategory();
+      setCategoryRecords(fetchedCategories);
+    };
     fetchNewsData();
+    fetchCategories();
   }, []);
 
   const handleUpdate = async (values: NewsRecord) => {
@@ -123,6 +132,19 @@ export default function NewsDetailsPage() {
                 form.setFieldsValue({ release_date: date ? date.toDate() : null });
               }}
             />
+          </Form.Item>
+          <Form.Item name="category_id" label="カテゴリー">
+            <Select
+              value={newsData?.category_id || ''}
+              onChange={(value) => form.setFieldsValue({ category_id: value })}
+            >
+              <Option value="">（選択してください）</Option>
+              {categoryRecords.map((ategoryRecord) => (
+                <Option key={ategoryRecord.id} value={ategoryRecord.id}>
+                  {ategoryRecord.name}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item name="title" label="タイトル" rules={[{ required: true, message: 'タイトルを入力してください' }]}>
             <Input />

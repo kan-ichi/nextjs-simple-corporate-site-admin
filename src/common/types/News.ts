@@ -1,4 +1,3 @@
-import { CategoryRecord } from '@/common/types/Category';
 import { RecordBase } from '@/common/types/RecordBase';
 
 /**
@@ -9,8 +8,7 @@ export interface News {
   title: string;
   description: string;
   content: string;
-  image_b64?: string;
-  category?: CategoryRecord;
+  category_id?: string;
 }
 
 /**
