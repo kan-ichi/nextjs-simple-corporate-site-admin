@@ -9,7 +9,7 @@ export const FIREBASE_REALTIME_DATABASE = {
   /**
    * Category のDBコレクション名
    */
-  COLLECTION_NAME_CATEGORY: 'category',
+  COLLECTION_NAME_CATEGORIES: 'categories',
   /**
    * News のDBコレクション名
    */

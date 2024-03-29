@@ -66,12 +66,12 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/category' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/categories' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
           >
-            <Link href="/menu/category" className="flex items-center px-4 py-2">
+            <Link href="/menu/categories" className="flex items-center px-4 py-2">
               <BookOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
               {!collapsed && <span>カテゴリー一覧・編集</span>}
             </Link>

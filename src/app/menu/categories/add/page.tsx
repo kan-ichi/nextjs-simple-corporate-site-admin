@@ -17,7 +17,7 @@ export default function AddCategoryPage() {
       await DalCategory.addCategory(values);
       message.success('カテゴリーが正常に登録されました');
       form.resetFields();
-      router.push('/menu/category');
+      router.push('/menu/categories');
     } catch (error) {
       console.error('Failed to add category:', error);
       message.error('カテゴリーの登録に失敗しました');
@@ -41,7 +41,7 @@ export default function AddCategoryPage() {
           <Button type="primary" htmlType="submit" loading={isLoading}>
             登録
           </Button>
-          <Button className="ml-2" onClick={() => router.push('/menu/category')} type="default">
+          <Button className="ml-2" onClick={() => router.push('/menu/categories')} type="default">
             キャンセル
           </Button>
         </Form.Item>

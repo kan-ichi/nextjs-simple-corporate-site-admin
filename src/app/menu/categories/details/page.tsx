@@ -21,7 +21,7 @@ export default function CategoryDetailsPage() {
         const category = await DalCategory.getCategoryById(id);
         if (!category) {
           message.error('カテゴリーを取得できません');
-          router.push('/menu/category');
+          router.push('/menu/categories');
           return;
         }
         setCategoryData(category);
@@ -42,7 +42,7 @@ export default function CategoryDetailsPage() {
       };
       await DalCategory.updateCategory(updatedCategory);
       message.success('カテゴリーが正常に更新されました');
-      router.push('/menu/category');
+      router.push('/menu/categories');
     } catch (error) {
       console.error('Failed to update category:', error);
       message.error('カテゴリーの更新に失敗しました');
@@ -63,7 +63,7 @@ export default function CategoryDetailsPage() {
         try {
           await DalCategory.deleteCategory(id);
           message.success('カテゴリーが正常に削除されました');
-          router.push('/menu/category');
+          router.push('/menu/categories');
         } catch (error) {
           console.error('Failed to delete category:', error);
           message.error('カテゴリーの削除に失敗しました');
@@ -92,7 +92,7 @@ export default function CategoryDetailsPage() {
             <Button className="m-1" danger onClick={handleDelete} loading={isLoading}>
               削除
             </Button>
-            <Button className="m-1" onClick={() => router.push('/menu/category')} type="default">
+            <Button className="m-1" onClick={() => router.push('/menu/categories')} type="default">
               キャンセル
             </Button>
           </Form.Item>

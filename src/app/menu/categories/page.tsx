@@ -79,7 +79,7 @@ export default function CategoryListPage() {
           <Button
             className="mr-2"
             type="primary"
-            onClick={() => router.push(`/menu/category/details?id=${DbKeyUtils.convertDbKeyToBase62(record.id)}`)}
+            onClick={() => router.push(`/menu/categories/details?id=${DbKeyUtils.convertDbKeyToBase62(record.id)}`)}
           >
             編集
           </Button>
@@ -95,7 +95,7 @@ export default function CategoryListPage() {
     <div className="min-h-screen grid grid-rows-[auto_1fr]">
       <div className="mb-1 flex justify-between items-center">
         <h1 className="text-3xl font-bold ml-10">カテゴリー</h1>
-        <Button className="align-middle mr-10" type="primary" onClick={() => router.push('/menu/category/add')}>
+        <Button className="align-middle mr-10" type="primary" onClick={() => router.push('/menu/categories/add')}>
           新規カテゴリー登録
         </Button>
       </div>
