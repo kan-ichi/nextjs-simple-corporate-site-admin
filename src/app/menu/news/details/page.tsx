@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 export default function NewsDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
   const searchParams = useSearchParams();
   const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
@@ -40,12 +41,13 @@ export default function NewsDetailsPage() {
   }, []);
 
   const handleUpdate = async (values: NewsRecord) => {
+    setIsLoading(true);
     try {
       if (isImageFileAdded && uploadedFile) {
-        FirebaseStorage.uploadImageFile(uploadedFile, id);
+        await FirebaseStorage.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
-        FirebaseStorage.deleteImageFile(id);
+        await FirebaseStorage.deleteImageFile(id);
       }
       const updatedNews: NewsRecord = {
         ...values,
@@ -58,6 +60,7 @@ export default function NewsDetailsPage() {
       console.error('Failed to update news:', error);
       message.error('ニュースの更新に失敗しました');
     }
+    setIsLoading(false);
   };
 
   const handleDelete = async () => {
@@ -84,7 +87,7 @@ export default function NewsDetailsPage() {
   };
 
   return (
-    <div>
+    <div className="p-8">
       <h1>ニュース編集</h1>
       {newsData ? (
         <Form form={form} onFinish={handleUpdate} initialValues={newsData}>
@@ -137,13 +140,13 @@ export default function NewsDetailsPage() {
             fileUploadedCallback={(value: File | null) => setUploadedFile(value)}
           />
           <Form.Item className="mt-3">
-            <Button className="m-1" type="primary" htmlType="submit">
+            <Button className="m-1" type="primary" htmlType="submit" loading={isLoading}>
               更新
             </Button>
-            <Button className="m-1" danger onClick={handleDelete}>
+            <Button className="m-1" danger onClick={handleDelete} loading={isLoading}>
               削除
             </Button>
-            <Button className="m-1" onClick={() => router.push('/menu/news')} type="default">
+            <Button className="m-1" onClick={() => router.push('/menu/news')} type="default" loading={isLoading}>
               キャンセル
             </Button>
           </Form.Item>

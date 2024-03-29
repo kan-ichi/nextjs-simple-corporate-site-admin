@@ -12,14 +12,16 @@ import { useState } from 'react';
 export default function AddNewsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [isImageFileAdded, setIsImageFileAdded] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const handleSubmit = async (values: News) => {
+    setIsLoading(true);
     try {
       const addedRecord = await DalNews.addNews(values);
       if (isImageFileAdded && uploadedFile) {
-        FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
+        await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
       }
       message.success('ニュースが正常に登録されました');
       form.resetFields();
@@ -28,10 +30,11 @@ export default function AddNewsPage() {
       console.error('Failed to add news:', error);
       message.error('ニュースの登録に失敗しました');
     }
+    setIsLoading(false);
   };
 
   return (
-    <div>
+    <div className="p-8">
       <h1>新規ニュース登録</h1>
       <Form form={form} onFinish={handleSubmit}>
         <Form.Item
@@ -77,13 +80,14 @@ export default function AddNewsPage() {
         </Form.Item>
         <UploadImage
           isImageFileAddedCallback={(value: boolean) => setIsImageFileAdded(value)}
+          isImageFileDeletedCallback={() => {}}
           fileUploadedCallback={(value: File | null) => setUploadedFile(value)}
         />
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={isLoading}>
             登録
           </Button>
-          <Button className="ml-2" onClick={() => router.push('/menu/news')} type="default">
+          <Button className="ml-2" onClick={() => router.push('/menu/news')} type="default" loading={isLoading}>
             キャンセル
           </Button>
         </Form.Item>
