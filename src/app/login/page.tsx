@@ -7,7 +7,7 @@ export default function Login() {
 
   const handleLogin = () => {
     // ログインロジックの実装
-    router.push('/menu/top_page');
+    router.push('/menu/news');
   };
 
   return (
