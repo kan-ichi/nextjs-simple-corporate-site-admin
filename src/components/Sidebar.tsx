@@ -1,5 +1,6 @@
 'use client';
 import {
+  BookOutlined,
   FormOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -59,7 +60,19 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           >
             <Link href="/menu/top_page" className="flex items-center px-4 py-2">
               <FormOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
-              {!collapsed && <span>トップページ</span>}
+              {!collapsed && <span>トップページ編集</span>}
+            </Link>
+          </li>
+          <li
+            className={`${
+              pathname === '/menu/category' ? 'bg-gray-400 dark:bg-gray-600' : ''
+            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
+              collapsed ? 'justify-center' : ''
+            }`}
+          >
+            <Link href="/menu/category" className="flex items-center px-4 py-2">
+              <BookOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
+              {!collapsed && <span>カテゴリー一覧・編集</span>}
             </Link>
           </li>
           <li
@@ -71,7 +84,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           >
             <Link href="/menu/news" className="flex items-center px-4 py-2">
               <NotificationOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
-              {!collapsed && <span>ニュース一覧</span>}
+              {!collapsed && <span>ニュース一覧・編集</span>}
             </Link>
           </li>
         </ul>
