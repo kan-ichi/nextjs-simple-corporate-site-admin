@@ -24,7 +24,8 @@ export default function AddBusinessPage() {
       };
       const addedRecord = await DalBusiness.addBusiness(businessData);
       if (isImageFileAdded && uploadedFile) {
-        await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
+        const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
+        await DalBusiness.updateBusiness({ ...addedRecord, imagefile_url: uploadedImageUrl });
       }
 
       message.success('事業内容が正常に登録されました');

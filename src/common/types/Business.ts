@@ -4,6 +4,7 @@ import { RecordBase } from '@/common/types/RecordBase';
  *  事業内容の型定義
  */
 export interface Business {
+  imagefile_url?: string;
   logo_url?: string;
   description: string;
   service_url?: string;

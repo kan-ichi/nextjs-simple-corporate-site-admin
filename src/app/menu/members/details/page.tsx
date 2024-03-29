@@ -40,15 +40,18 @@ export default function MemberDetailsPage() {
 
   const handleUpdate = async (values: MemberRecord) => {
     setIsLoading(true);
+    let uploadedImageUrl: string = values.imagefile_url || '';
     try {
       if (isImageFileAdded && uploadedFile) {
-        await FirebaseStorage.uploadImageFile(uploadedFile, id);
+        uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
         await FirebaseStorage.deleteImageFile(id);
+        uploadedImageUrl = '';
       }
       const updatedMember: MemberRecord = {
         ...values,
+        imagefile_url: uploadedImageUrl,
         id,
       };
       await DalMember.updateMember(updatedMember);

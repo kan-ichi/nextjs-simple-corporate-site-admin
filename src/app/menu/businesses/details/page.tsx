@@ -40,16 +40,19 @@ export default function BusinessDetailsPage() {
 
   const handleUpdate = async (values: BusinessRecord) => {
     setIsLoading(true);
+    let uploadedImageUrl: string = values.imagefile_url || '';
     try {
       if (isImageFileAdded && uploadedFile) {
-        await FirebaseStorage.uploadImageFile(uploadedFile, id);
+        uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
         await FirebaseStorage.deleteImageFile(id);
+        uploadedImageUrl = '';
       }
       const updatedBusiness: BusinessRecord = {
         ...values,
         id,
+        imagefile_url: uploadedImageUrl,
         logo_url: values.logo_url || '',
         service_url: values.service_url || '',
       };

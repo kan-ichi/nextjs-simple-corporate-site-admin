@@ -51,15 +51,18 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     setIsLoading(true);
+    let uploadedImageUrl: string = values.imagefile_url || '';
     try {
       if (isImageFileAdded && uploadedFile) {
-        await FirebaseStorage.uploadImageFile(uploadedFile, id);
+        uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
         await FirebaseStorage.deleteImageFile(id);
+        uploadedImageUrl = '';
       }
       const updatedNews: NewsRecord = {
         ...values,
+        imagefile_url: uploadedImageUrl,
         id,
       };
       await DalNews.updateNews(updatedNews);

@@ -19,7 +19,8 @@ export default function AddMemberPage() {
     try {
       const addedRecord = await DalMember.addMember(values);
       if (isImageFileAdded && uploadedFile) {
-        await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
+        const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
+        await DalMember.updateMember({ ...addedRecord, imagefile_url: uploadedImageUrl });
       }
       message.success('メンバーが正常に登録されました');
       form.resetFields();

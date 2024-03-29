@@ -4,6 +4,7 @@ import { RecordBase } from '@/common/types/RecordBase';
  *  メンバーの型定義
  */
 export interface Member {
+  imagefile_url?: string;
   name: string;
   position: string;
   profile: string;

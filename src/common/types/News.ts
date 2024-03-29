@@ -4,6 +4,7 @@ import { RecordBase } from '@/common/types/RecordBase';
  * ニュースの型定義
  */
 export interface News {
+  imagefile_url?: string;
   release_date: string;
   title: string;
   description: string;
