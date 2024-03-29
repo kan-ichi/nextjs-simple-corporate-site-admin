@@ -7,13 +7,17 @@ export const FIREBASE_REALTIME_DATABASE = {
    */
   COLLECTION_TOP_PAGE: 'top_page',
   /**
+   * Business のDBコレクション名
+   */
+  COLLECTION_NAME_BUSINESSES: 'businesses',
+  /**
    * Category のDBコレクション名
    */
   COLLECTION_NAME_CATEGORIES: 'categories',
   /**
    * News のDBコレクション名
    */
-  COLLECTION_NAME_NEWS: 'News',
+  COLLECTION_NAME_NEWS: 'news',
   /**
    * Member のDBコレクション名
    */
