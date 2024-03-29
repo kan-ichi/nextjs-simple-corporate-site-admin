@@ -14,4 +14,8 @@ export const FIREBASE_REALTIME_DATABASE = {
    * News のDBコレクション名
    */
   COLLECTION_NAME_NEWS: 'News',
+  /**
+   * Member のDBコレクション名
+   */
+  COLLECTION_NAME_MEMBERS: 'members',
 } as const;

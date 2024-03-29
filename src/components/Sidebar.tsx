@@ -6,6 +6,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   NotificationOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { Modal } from 'antd';
 import Link from 'next/link';
@@ -87,6 +88,18 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
               {!collapsed && <span>ニュース一覧・編集</span>}
             </Link>
           </li>
+          <li
+            className={`${
+              pathname === '/menu/members' ? 'bg-gray-400 dark:bg-gray-600' : ''
+            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
+              collapsed ? 'justify-center' : ''
+            }`}
+          >
+            <Link href="/menu/members" className="flex items-center px-4 py-2">
+              <TeamOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
+              {!collapsed && <span>メンバー一覧・編集</span>}
+            </Link>
+          </li>{' '}
         </ul>
       </nav>
       <div className="mb-4">
