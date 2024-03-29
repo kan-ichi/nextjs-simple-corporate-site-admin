@@ -15,6 +15,19 @@ export default function NewsListPage() {
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const [tableRowsHeight, setTableRowsHeight] = useState(0);
 
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        let news = await DalNews.getAllNews();
+        news.sort((a, b) => new Date(a.release_date).getTime() - new Date(b.release_date).getTime());
+        setNewsList(news);
+      } catch (error) {
+        console.error('Failed to fetch news:', error);
+      }
+    };
+    fetchNews();
+  }, []);
+
   const handleResize = useCallback(() => {
     const tableContainer = tableContainerRef.current;
     if (tableContainer) {
@@ -30,18 +43,6 @@ export default function NewsListPage() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [handleResize]);
-
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const news = await DalNews.getAllNews();
-        setNewsList(news);
-      } catch (error) {
-        console.error('Failed to fetch news:', error);
-      }
-    };
-    fetchNews();
-  }, []);
 
   const handleDelete = async (id: string) => {
     Modal.confirm({
