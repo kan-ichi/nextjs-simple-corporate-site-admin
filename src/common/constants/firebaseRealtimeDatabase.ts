@@ -3,6 +3,10 @@
  */
 export const FIREBASE_REALTIME_DATABASE = {
   /**
+   * Meta のDBコレクション名
+   */
+  COLLECTION_META: 'meta',
+  /**
    * TopPage のDBコレクション名
    */
   COLLECTION_TOP_PAGE: 'top_page',

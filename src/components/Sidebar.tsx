@@ -1,5 +1,6 @@
 'use client';
 import {
+  AppstoreOutlined,
   BookOutlined,
   FormOutlined,
   LogoutOutlined,
@@ -54,11 +55,22 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
         <ul className="list-none pl-0">
           <li
             className={`${
-              pathname === '/menu' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/meta' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
-            title={!collapsed ? 'メニュー' : ''}
+          >
+            <Link href="/menu/meta" className="flex items-center px-4 py-2">
+              <AppstoreOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
+              {!collapsed && <span>メタ情報編集</span>}
+            </Link>
+          </li>
+          <li
+            className={`${
+              pathname === '/menu/top_page' ? 'bg-gray-400 dark:bg-gray-600' : ''
+            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
+              collapsed ? 'justify-center' : ''
+            }`}
           >
             <Link href="/menu/top_page" className="flex items-center px-4 py-2">
               <FormOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
