@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 interface UploadImageProps {
   existingFileName?: string;
   isImageFileAddedCallback: (isImageFileAdded: boolean) => void;
-  isImageFileDeletedCallback?: (isImageFileDeleted: boolean) => void;
+  isImageFileDeletedCallback: (isImageFileDeleted: boolean) => void;
   fileUploadedCallback: (uploadedFile: File | null) => void;
 }
 
@@ -43,7 +43,7 @@ export default function UploadImage({
   const handleRemove = (file: UploadFile) => {
     const updatedFileList = imageFileList.filter((f) => f.uid !== file.uid);
     if (updatedFileList.length === 0) {
-      isImageFileDeletedCallback ?? true;
+      isImageFileDeletedCallback(true);
       isImageFileAddedCallback(false);
       fileUploadedCallback(null);
     }
@@ -71,7 +71,7 @@ export default function UploadImage({
         return Upload.LIST_IGNORE;
       } else {
         isImageFileAddedCallback(true);
-        isImageFileDeletedCallback ?? false;
+        isImageFileDeletedCallback(false);
         fileUploadedCallback(file);
         previewImage(file);
       }
