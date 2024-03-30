@@ -56,7 +56,7 @@ export default function MemberDetailsPage() {
 
   const handleUpdate = async (values: MemberRecord) => {
     setIsLoading(true);
-    let uploadedImageUrl: string = values.imagefile_url || '';
+    let uploadedImageUrl: string = (await FirebaseStorage.getImageFileURL(id)) || '';
     try {
       if (isImageFileAdded && uploadedFile) {
         uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
