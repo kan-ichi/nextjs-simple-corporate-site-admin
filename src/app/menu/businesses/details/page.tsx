@@ -1,42 +1,58 @@
 'use client';
-import { Business, BusinessRecord } from '@/common/types/Business';
+import { BusinessRecord } from '@/common/types/Business';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import UploadImage from '@/components/UploadImage';
 import { DalBusiness } from '@/features/DalBusiness';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, message } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function BusinessDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [id, setId] = useState('');
   const [businessData, setBusinessData] = useState<BusinessRecord | null>(null);
-  const searchParams = useSearchParams();
-  const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
   const [isImageFileAdded, setIsImageFileAdded] = useState(false);
   const [isImageFileDeleted, setIsImageFileDeleted] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const fetchBusinessData = async () => {
-      try {
-        const business = await DalBusiness.getBusinessById(id);
-        if (!business) {
-          message.error('事業内容を取得できません');
-          router.push('/menu/businesses');
-          return;
-        }
-        setBusinessData(business);
-        form.setFieldsValue(business);
-      } catch (error) {
-        console.error('Failed to fetch business data:', error);
-      }
+    // ページ表示時に、パラメーターから id を取得
+    const handleRouteChange = () => {
+      const queryId = window.location.search.split('?id=')[1];
+      const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
+      setId(convertedId);
+
+      fetchBusinessData(convertedId);
     };
-    fetchBusinessData();
+    handleRouteChange(); // 初期レンダリング時にIDを取得
+    window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
+    return () => window.removeEventListener('popstate', handleRouteChange); // クリーンアップ関数
   }, []);
+
+  /**
+   * Business を取得します
+   */
+  const fetchBusinessData = async (convertedId: string) => {
+    setIsLoading(true);
+    try {
+      const business = await DalBusiness.getBusinessById(convertedId);
+      if (!business) {
+        message.error('事業内容を取得できません');
+        router.push('/menu/businesses');
+        return;
+      }
+      setBusinessData(business);
+      form.setFieldsValue(business);
+    } catch (error) {
+      console.error('Failed to fetch business data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleUpdate = async (values: BusinessRecord) => {
     setIsLoading(true);

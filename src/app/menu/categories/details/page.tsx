@@ -4,34 +4,49 @@ import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { DalCategory } from '@/features/DalCategory';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, message } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function CategoryDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [id, setId] = useState('');
   const [categoryData, setCategoryData] = useState<CategoryRecord | null>(null);
-  const searchParams = useSearchParams();
-  const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
 
   useEffect(() => {
-    const fetchCategoryData = async () => {
-      try {
-        const category = await DalCategory.getCategoryById(id);
-        if (!category) {
-          message.error('カテゴリーを取得できません');
-          router.push('/menu/categories');
-          return;
-        }
-        setCategoryData(category);
-        form.setFieldsValue(category);
-      } catch (error) {
-        console.error('Failed to fetch category data:', error);
-      }
+    // ページ表示時に、パラメーターから id を取得
+    const handleRouteChange = () => {
+      const queryId = window.location.search.split('?id=')[1];
+      const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
+      setId(convertedId);
+      fetchCategoryData(convertedId);
     };
-    fetchCategoryData();
+    handleRouteChange(); // 初期レンダリング時にIDを取得
+    window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
+    return () => window.removeEventListener('popstate', handleRouteChange); // クリーンアップ関数
   }, []);
+
+  /**
+   * Category を取得します
+   */
+  const fetchCategoryData = async (convertedId: string) => {
+    setIsLoading(true);
+    try {
+      const category = await DalCategory.getCategoryById(convertedId);
+      if (!category) {
+        message.error('カテゴリーを取得できません');
+        router.push('/menu/categories');
+        return;
+      }
+      setCategoryData(category);
+      form.setFieldsValue(category);
+    } catch (error) {
+      console.error('Failed to fetch category data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleUpdate = async (values: CategoryRecord) => {
     setIsLoading(true);
@@ -46,8 +61,9 @@ export default function CategoryDetailsPage() {
     } catch (error) {
       console.error('Failed to update category:', error);
       message.error('カテゴリーの更新に失敗しました');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleDelete = async () => {

@@ -6,37 +6,53 @@ import { DalMember } from '@/features/DalMember';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, message } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function MemberDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [id, setId] = useState('');
   const [memberData, setMemberData] = useState<MemberRecord | null>(null);
-  const searchParams = useSearchParams();
-  const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
   const [isImageFileAdded, setIsImageFileAdded] = useState(false);
   const [isImageFileDeleted, setIsImageFileDeleted] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const fetchMemberData = async () => {
-      try {
-        const member = await DalMember.getMemberById(id);
-        if (!member) {
-          message.error('メンバーを取得できません');
-          router.push('/menu/members');
-          return;
-        }
-        setMemberData(member);
-        form.setFieldsValue(member);
-      } catch (error) {
-        console.error('Failed to fetch member data:', error);
-      }
+    // ページ表示時に、パラメーターから id を取得
+    const handleRouteChange = () => {
+      const queryId = window.location.search.split('?id=')[1];
+      const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
+      setId(convertedId);
+
+      fetchMemberData(convertedId);
     };
-    fetchMemberData();
+    handleRouteChange(); // 初期レンダリング時にIDを取得
+    window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
+    return () => window.removeEventListener('popstate', handleRouteChange); // クリーンアップ関数
   }, []);
+
+  /**
+   * Member を取得します
+   */
+  const fetchMemberData = async (convertedId: string) => {
+    setIsLoading(true);
+    try {
+      const member = await DalMember.getMemberById(convertedId);
+      if (!member) {
+        message.error('メンバーを取得できません');
+        router.push('/menu/members');
+        return;
+      }
+      setMemberData(member);
+      form.setFieldsValue(member);
+    } catch (error) {
+      console.error('Failed to fetch member data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleUpdate = async (values: MemberRecord) => {
     setIsLoading(true);

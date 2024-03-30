@@ -10,7 +10,7 @@ import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, Select, message } from 'antd';
 import dayjs from 'dayjs';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 const { Option } = Select;
 
@@ -18,36 +18,60 @@ export default function NewsDetailsPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryRecords, setCategoryRecords] = useState<CategoryRecord[]>([]);
+  const [id, setId] = useState('');
   const [newsData, setNewsData] = useState<NewsRecord | null>(null);
-  const searchParams = useSearchParams();
-  const id = DbKeyUtils.convertBase62ToDbKey(searchParams.get('id') as string);
+  const [categoryRecords, setCategoryRecords] = useState<CategoryRecord[]>([]);
   const [isImageFileAdded, setIsImageFileAdded] = useState(false);
   const [isImageFileDeleted, setIsImageFileDeleted] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const fetchNewsData = async () => {
-      try {
-        const news = await DalNews.getNewsById(id);
-        if (!news) {
-          message.error('ニュースを取得できません');
-          router.push('/menu/news');
-          return;
-        }
-        setNewsData(news);
-        form.setFieldsValue(news);
-      } catch (error) {
-        console.error('Failed to fetch news data:', error);
-      }
+    // ページ表示時に、パラメーターから id を取得
+    const handleRouteChange = () => {
+      const queryId = window.location.search.split('?id=')[1];
+      const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
+      setId(convertedId);
+
+      fetchNewsData(convertedId);
+      fetchCategories();
     };
-    const fetchCategories = async () => {
+    handleRouteChange(); // 初期レンダリング時にIDを取得
+    window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
+    return () => window.removeEventListener('popstate', handleRouteChange); // クリーンアップ関数
+  }, []);
+
+  /**
+   * News を取得します
+   */
+  const fetchNewsData = async (convertedId: string) => {
+    setIsLoading(true);
+    try {
+      const news = await DalNews.getNewsById(convertedId);
+      if (!news) {
+        message.error('ニュースを取得できません');
+        router.push('/menu/news');
+        return;
+      }
+      setNewsData(news);
+      form.setFieldsValue(news);
+    } catch (error) {
+      console.error('Failed to fetch news data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Category を取得します
+   */
+  const fetchCategories = async () => {
+    try {
       const fetchedCategories = await DalCategory.getAllCategory();
       setCategoryRecords(fetchedCategories);
-    };
-    fetchNewsData();
-    fetchCategories();
-  }, []);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const handleUpdate = async (values: NewsRecord) => {
     setIsLoading(true);
