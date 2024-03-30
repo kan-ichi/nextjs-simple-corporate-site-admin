@@ -4,5 +4,6 @@ const nextConfig = {
   experimental: {
     typedRoutes: true,
   },
+  trailingSlash: true,
 };
 export default nextConfig;
