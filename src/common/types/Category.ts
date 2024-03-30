@@ -1,4 +1,4 @@
-import { RecordBase } from '@/common/types/RecordBase';
+import { RecordBase } from './RecordBase';
 
 /**
  * カテゴリーの型定義

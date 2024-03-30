@@ -1,4 +1,4 @@
-import { RecordBase } from '@/common/types/RecordBase';
+import { RecordBase } from './RecordBase';
 
 /**
  * メタ情報の型定義

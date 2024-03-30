@@ -1,4 +1,4 @@
-import { RecordBase } from '@/common/types/RecordBase';
+import { RecordBase } from './RecordBase';
 
 /**
  *  事業内容の型定義
