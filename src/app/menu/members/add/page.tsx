@@ -1,4 +1,5 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { Member } from '@/common/types/Member';
 import UploadImage from '@/components/UploadImage';
 import { DalMember } from '@/features/DalMember';
@@ -8,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AddMemberPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -17,10 +19,13 @@ export default function AddMemberPage() {
   const handleSubmit = async (values: Member) => {
     setIsLoading(true);
     try {
-      const addedRecord = await DalMember.addMember(values);
+      const addedRecord = await new DalMember({ appGlobalContextValue }).addMember(values);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await DalMember.updateMember({ ...addedRecord, imagefile_url: uploadedImageUrl });
+        await new DalMember({ appGlobalContextValue }).updateMember({
+          ...addedRecord,
+          imagefile_url: uploadedImageUrl,
+        });
       }
       message.success('メンバーが正常に登録されました');
       form.resetFields();

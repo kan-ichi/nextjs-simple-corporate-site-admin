@@ -1,4 +1,5 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { CategoryRecord } from '@/common/types/Category';
 import { News } from '@/common/types/News';
 import DatePickerJapanese from '@/components/DatePickerJapanese';
@@ -13,6 +14,7 @@ import { useEffect, useState } from 'react';
 const { Option } = Select;
 
 export default function AddNewsPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +24,7 @@ export default function AddNewsPage() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const fetchedCategories = await DalCategory.getAllCategory();
+      const fetchedCategories = await new DalCategory({ appGlobalContextValue }).getAllCategory();
       setCategoryRecords(fetchedCategories);
     };
     fetchCategories();
@@ -31,10 +33,10 @@ export default function AddNewsPage() {
   const handleSubmit = async (values: News) => {
     setIsLoading(true);
     try {
-      const addedRecord = await DalNews.addNews(values);
+      const addedRecord = await new DalNews({ appGlobalContextValue }).addNews(values);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await DalNews.updateNews({ ...addedRecord, imagefile_url: uploadedImageUrl });
+        await new DalNews({ appGlobalContextValue }).updateNews({ ...addedRecord, imagefile_url: uploadedImageUrl });
       }
       message.success('ニュースが正常に登録されました');
       form.resetFields();

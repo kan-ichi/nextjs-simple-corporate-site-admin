@@ -1,4 +1,5 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { CategoryRecord } from '@/common/types/Category';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { DalCategory } from '@/features/DalCategory';
@@ -8,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function CategoryListPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const router = useRouter();
   const [categoryList, setCategoryList] = useState<CategoryRecord[]>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -16,7 +18,7 @@ export default function CategoryListPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categories = await DalCategory.getAllCategory();
+        const categories = await new DalCategory({ appGlobalContextValue }).getAllCategory();
         setCategoryList(categories);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -52,7 +54,7 @@ export default function CategoryListPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await DalCategory.deleteCategory(id);
+          await new DalCategory({ appGlobalContextValue }).deleteCategory(id);
           setCategoryList(categoryList.filter((category) => category.id !== id));
           message.success('カテゴリーが正常に削除されました');
         } catch (error) {

@@ -1,21 +1,41 @@
 import { FIREBASE_REALTIME_DATABASE_COLLECTION_NAME } from '@/common/constants/firebaseRealtimeDatabase';
+import { AppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { Meta, MetaRecord } from '@/common/types/Meta';
 import { FirebaseRealtimeDatabase } from '@/features/FirebaseRealtimeDatabase';
 
 /**
+ * コンストラクタ引数
+ */
+export interface ConstructorArguments {
+  dataTreeName?: string;
+  appGlobalContextValue?: AppGlobalContextValue;
+}
+
+/**
  * Meta データアクセスレイヤー
  */
-export module DalMeta {
+export class DalMeta {
+  private options: ConstructorArguments;
+  constructor(options: ConstructorArguments) {
+    this.options = options;
+  }
+
   /**
-   * Firebase Realtime Database DBコレクション名
+   * Firebase Realtime Database データ操作クラスを生成します
    */
-  const COLLECTION_NAME = FIREBASE_REALTIME_DATABASE_COLLECTION_NAME.COLLECTION_META;
+  createFirebaseRealtimeDatabase() {
+    return new FirebaseRealtimeDatabase({
+      dataTreeName: this.options?.dataTreeName,
+      appGlobalContextValue: this.options?.appGlobalContextValue,
+      collectionName: FIREBASE_REALTIME_DATABASE_COLLECTION_NAME.COLLECTION_META,
+    });
+  }
 
   /**
    * DBから Meta を取得します
    */
-  export async function getMeta(): Promise<MetaRecord | null> {
-    const dal = new FirebaseRealtimeDatabase({ collectionName: COLLECTION_NAME });
+  async getMeta(): Promise<MetaRecord | null> {
+    const dal = this.createFirebaseRealtimeDatabase();
     const records = await dal.getAllRecords();
     if (records.length !== 0) {
       const data = records[0].data as Meta;
@@ -28,10 +48,10 @@ export module DalMeta {
   /**
    * DBの Meta を更新します
    */
-  export async function upsertMeta(data: Meta): Promise<MetaRecord> {
+  async upsertMeta(data: Meta): Promise<MetaRecord> {
     let newRecord: any;
-    const oldRecord = await getMeta();
-    const dal = new FirebaseRealtimeDatabase({ collectionName: COLLECTION_NAME });
+    const oldRecord = await this.getMeta();
+    const dal = this.createFirebaseRealtimeDatabase();
     if (oldRecord) {
       newRecord = await dal.updateRecord({ ...oldRecord, ...data }, oldRecord.id);
     } else {

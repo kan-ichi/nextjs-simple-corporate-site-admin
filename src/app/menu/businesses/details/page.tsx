@@ -1,4 +1,5 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { BusinessRecord } from '@/common/types/Business';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import UploadImage from '@/components/UploadImage';
@@ -10,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function BusinessDetailsPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function BusinessDetailsPage() {
   const fetchBusinessData = async (convertedId: string) => {
     setIsLoading(true);
     try {
-      const business = await DalBusiness.getBusinessById(convertedId);
+      const business = await new DalBusiness({ appGlobalContextValue }).getBusinessById(convertedId);
       if (!business) {
         message.error('事業内容を取得できません');
         router.push('/menu/businesses');
@@ -72,7 +74,7 @@ export default function BusinessDetailsPage() {
         logo_url: values.logo_url || '',
         service_url: values.service_url || '',
       };
-      await DalBusiness.updateBusiness(updatedBusiness);
+      await new DalBusiness({ appGlobalContextValue }).updateBusiness(updatedBusiness);
       message.success('事業内容が正常に更新されました');
       router.push('/menu/businesses');
     } catch (error) {
@@ -94,7 +96,7 @@ export default function BusinessDetailsPage() {
       onOk: async () => {
         try {
           FirebaseStorage.deleteImageFile(id);
-          await DalBusiness.deleteBusiness(id);
+          await new DalBusiness({ appGlobalContextValue }).deleteBusiness(id);
           message.success('事業内容が正常に削除されました');
           router.push('/menu/businesses');
         } catch (error) {

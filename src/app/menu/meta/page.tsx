@@ -1,10 +1,12 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { Meta, MetaRecord } from '@/common/types/Meta';
 import { DalMeta } from '@/features/DalMeta';
 import { Button, Form, Input, message } from 'antd';
 import { useEffect, useState } from 'react';
 
 export default function MetaForm() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const [metaData, setMetaData] = useState<MetaRecord | null>(null);
 
@@ -14,9 +16,9 @@ export default function MetaForm() {
 
   const fetchMetaData = async () => {
     try {
-      const data = await DalMeta.getMeta();
-      setMetaData(data);
+      const data = await new DalMeta({ appGlobalContextValue }).getMeta();
       if (data) {
+        setMetaData(data);
         form.setFieldsValue(data);
       }
     } catch (error) {
@@ -26,7 +28,7 @@ export default function MetaForm() {
 
   const handleSubmit = async (values: Meta) => {
     try {
-      await DalMeta.upsertMeta({
+      await new DalMeta({ appGlobalContextValue }).upsertMeta({
         ...values,
         title: values.title || '',
         description: values.description || '',

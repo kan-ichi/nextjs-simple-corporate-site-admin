@@ -1,4 +1,5 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { MemberRecord } from '@/common/types/Member';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { DalMember } from '@/features/DalMember';
@@ -9,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function MemberListPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const router = useRouter();
   const [memberList, setMemberList] = useState<MemberRecord[]>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -17,7 +19,7 @@ export default function MemberListPage() {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const members = await DalMember.getAllMember();
+        const members = await new DalMember({ appGlobalContextValue }).getAllMember();
         setMemberList(members);
       } catch (error) {
         console.error('Failed to fetch members:', error);
@@ -54,7 +56,7 @@ export default function MemberListPage() {
       onOk: async () => {
         try {
           await FirebaseStorage.deleteImageFile(id);
-          await DalMember.deleteMember(id);
+          await new DalMember({ appGlobalContextValue }).deleteMember(id);
           setMemberList(memberList.filter((member) => member.id !== id));
           message.success('メンバーが正常に削除されました');
         } catch (error) {

@@ -1,4 +1,5 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { CategoryRecord } from '@/common/types/Category';
 import { NewsRecord } from '@/common/types/News';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
@@ -15,6 +16,7 @@ import { useEffect, useState } from 'react';
 const { Option } = Select;
 
 export default function NewsDetailsPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +48,7 @@ export default function NewsDetailsPage() {
   const fetchNewsData = async (convertedId: string) => {
     setIsLoading(true);
     try {
-      const news = await DalNews.getNewsById(convertedId);
+      const news = await new DalNews({ appGlobalContextValue }).getNewsById(convertedId);
       if (!news) {
         message.error('ニュースを取得できません');
         router.push('/menu/news');
@@ -66,7 +68,7 @@ export default function NewsDetailsPage() {
    */
   const fetchCategories = async () => {
     try {
-      const fetchedCategories = await DalCategory.getAllCategory();
+      const fetchedCategories = await new DalCategory({ appGlobalContextValue }).getAllCategory();
       setCategoryRecords(fetchedCategories);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
@@ -89,7 +91,7 @@ export default function NewsDetailsPage() {
         imagefile_url: uploadedImageUrl,
         id,
       };
-      await DalNews.updateNews(updatedNews);
+      await new DalNews({ appGlobalContextValue }).updateNews(updatedNews);
       message.success('ニュースが正常に更新されました');
       router.push('/menu/news');
     } catch (error) {
@@ -111,7 +113,7 @@ export default function NewsDetailsPage() {
       onOk: async () => {
         try {
           FirebaseStorage.deleteImageFile(id);
-          await DalNews.deleteNews(id);
+          await new DalNews({ appGlobalContextValue }).deleteNews(id);
           message.success('ニュースが正常に削除されました');
           router.push('/menu/news');
         } catch (error) {

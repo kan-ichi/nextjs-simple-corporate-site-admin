@@ -1,3 +1,5 @@
+import { FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME } from '@/common/constants/firebaseRealtimeDatabase';
+import { AppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { RecordBase } from '@/common/types/RecordBase';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
@@ -6,8 +8,9 @@ import { child, endAt, get, getDatabase, orderByKey, query, ref, remove, set } f
 /**
  * コンストラクタ引数
  */
-export interface FirebaseRealtimeDatabaseOptions {
+export interface ConstructorArguments {
   dataTreeName?: string;
+  appGlobalContextValue?: AppGlobalContextValue;
   collectionName: string;
 }
 
@@ -15,22 +18,16 @@ export interface FirebaseRealtimeDatabaseOptions {
  * Firebase Realtime Database データ操作クラス
  */
 export class FirebaseRealtimeDatabase {
-  protected dataTreeName?: string;
-  protected collectionName: string;
-
-  constructor(options: FirebaseRealtimeDatabaseOptions) {
-    this.dataTreeName = options.dataTreeName;
-    this.collectionName = options.collectionName;
+  private options: ConstructorArguments;
+  constructor(options: ConstructorArguments) {
+    this.options = options;
   }
 
   /**
    * データをDBに追加し、追加したレコードを返します
    */
   async addRecord<T>(data: T): Promise<{ recordBase: RecordBase; data: T }> {
-    const dbRef = ref(
-      getDatabase(),
-      this.dataTreeName ? `${this.dataTreeName}/${this.collectionName}` : this.collectionName
-    );
+    const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
     const recordId = DbKeyUtils.generateDbKey();
     const recordRef = child(dbRef, recordId);
     const createDateTime = FirebaseRealtimeDatabase.convertDbKeyToDate(recordId);
@@ -53,10 +50,7 @@ export class FirebaseRealtimeDatabase {
    * DBからレコードを取得します
    */
   async getRecordById<T>(id: string): Promise<{ recordBase: RecordBase; data: T } | null> {
-    const dbRef = ref(
-      getDatabase(),
-      this.dataTreeName ? `${this.dataTreeName}/${this.collectionName}` : this.collectionName
-    );
+    const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
     const recordRef = child(dbRef, id);
     const recordSnapshot = await get(recordRef);
     if (recordSnapshot.exists()) {
@@ -78,10 +72,7 @@ export class FirebaseRealtimeDatabase {
    * DBからレコードを全件取得します
    */
   async getAllRecords<T>(): Promise<{ recordBase: RecordBase; data: T }[]> {
-    const dbRef = ref(
-      getDatabase(),
-      this.dataTreeName ? `${this.dataTreeName}/${this.collectionName}` : this.collectionName
-    );
+    const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
     const recordsRef = query(dbRef, orderByKey());
     const recordsSnapshot = await get(recordsRef);
     if (recordsSnapshot.exists()) {
@@ -103,10 +94,7 @@ export class FirebaseRealtimeDatabase {
    * DBのレコードを更新します
    */
   async updateRecord<T extends { id?: any }>(data: T, id: string): Promise<{ recordBase: RecordBase; data: T }> {
-    const dbRef = ref(
-      getDatabase(),
-      this.dataTreeName ? `${this.dataTreeName}/${this.collectionName}` : this.collectionName
-    );
+    const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
     const recordRef = child(dbRef, id);
     const updateDateTime = new Date();
     const updateData = {
@@ -129,10 +117,7 @@ export class FirebaseRealtimeDatabase {
    * DBからレコードを削除します
    */
   async deleteRecord<T>(id: string): Promise<string> {
-    const dbRef = ref(
-      getDatabase(),
-      this.dataTreeName ? `${this.dataTreeName}/${this.collectionName}` : this.collectionName
-    );
+    const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
     const recordRef = child(dbRef, id);
     await remove(recordRef);
     return id;
@@ -145,15 +130,25 @@ export class FirebaseRealtimeDatabase {
     // 基準年月日のDBキーを生成
     const deletionDbKeyEndAt = `${DbKeyUtils.generateDbKeyDateTimePart(deletionDateTime)}${'z'.repeat(32)}`;
     // データベースから基準年月日以前のデータを取得し、削除
-    const dbRef = ref(
-      getDatabase(),
-      this.dataTreeName ? `${this.dataTreeName}/${this.collectionName}` : this.collectionName
-    );
+    const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
     const oldRecordQuery = query(dbRef, orderByKey(), endAt(deletionDbKeyEndAt));
     const snapshot = await get(oldRecordQuery);
     snapshot.forEach((childSnapshot) => {
       remove(childSnapshot.ref);
     });
+  }
+
+  /**
+   * 各状態を判定し、データツリー名を取得します
+   */
+  getDataFullTreeName(options: ConstructorArguments): string {
+    if (options.dataTreeName) {
+      return `${options.dataTreeName}/${options.collectionName}`;
+    } else if (options?.appGlobalContextValue?.isProduction) {
+      return `${FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME.DATA_TREE_NAME_PRODUCTION}/${options.collectionName}`;
+    } else {
+      return `${FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME.DATA_TREE_NAME_STAGING}/${options.collectionName}`;
+    }
   }
 }
 

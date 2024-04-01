@@ -1,5 +1,6 @@
 'use client';
-import { Business, BusinessRecord } from '@/common/types/Business';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
+import { Business } from '@/common/types/Business';
 import UploadImage from '@/components/UploadImage';
 import { DalBusiness } from '@/features/DalBusiness';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
@@ -8,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AddBusinessPage() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,10 +24,13 @@ export default function AddBusinessPage() {
         logo_url: values.logo_url || '',
         service_url: values.service_url || '',
       };
-      const addedRecord = await DalBusiness.addBusiness(businessData);
+      const addedRecord = await new DalBusiness({ appGlobalContextValue }).addBusiness(businessData);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await DalBusiness.updateBusiness({ ...addedRecord, imagefile_url: uploadedImageUrl });
+        await new DalBusiness({ appGlobalContextValue }).updateBusiness({
+          ...addedRecord,
+          imagefile_url: uploadedImageUrl,
+        });
       }
 
       message.success('事業内容が正常に登録されました');

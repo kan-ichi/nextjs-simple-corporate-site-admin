@@ -1,42 +1,45 @@
 'use client';
+import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { TopPage, TopPageRecord } from '@/common/types/TopPage';
 import { DalTopPage } from '@/features/DalTopPage';
 import { Button, Form, Input, Switch, message } from 'antd';
 import { useEffect, useState } from 'react';
 
 export default function TopPageForm() {
+  const [appGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const [isHiringVisible, setIsHiringVisible] = useState(false);
   const [isMemberVisible, setIsMemberVisible] = useState(false);
   const [topPageData, setTopPageData] = useState<TopPageRecord | null>(null);
 
   useEffect(() => {
-    const fetchTopPageData = async () => {
-      try {
-        const data = await DalTopPage.getTopPage();
-        setTopPageData(data);
-        if (data) {
-          form.setFieldsValue(data);
-          setIsHiringVisible(data.is_hiring_visible);
-          setIsMemberVisible(data.is_member_visible);
-        }
-      } catch (error) {
-        console.error('Failed to fetch TopPage data:', error);
-      }
-    };
     fetchTopPageData();
-  }, [form]);
+  }, []);
+
+  const fetchTopPageData = async () => {
+    try {
+      const data = await new DalTopPage({ appGlobalContextValue }).getTopPage();
+      if (data) {
+        setTopPageData(data);
+        form.setFieldsValue(data);
+        setIsHiringVisible(data.is_hiring_visible);
+        setIsMemberVisible(data.is_member_visible);
+      }
+    } catch (error) {
+      console.error('Failed to fetch TopPage data:', error);
+    }
+  };
 
   const handleSubmit = async (values: TopPage & { is_hiring_visible: boolean; is_member_visible: boolean }) => {
     try {
-      const topPageRecord: TopPageRecord = await DalTopPage.upsertTopPage({
+      await new DalTopPage({ appGlobalContextValue }).upsertTopPage({
         ...values,
         is_hiring_visible: isHiringVisible,
         is_member_visible: isMemberVisible,
       });
       message.success('トップページデータが正常に登録されました');
       form.resetFields();
-      setTopPageData(topPageRecord);
+      fetchTopPageData();
     } catch (error) {
       console.error('Failed to add TopPage data:', error);
       message.error('トップページデータの登録に失敗しました');

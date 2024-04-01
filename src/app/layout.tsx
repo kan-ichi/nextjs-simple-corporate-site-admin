@@ -1,3 +1,4 @@
+import { AppGlobalContextProvider } from '@/common/contexts/AppGlobalContext';
 import type { Metadata } from 'next';
 import { Noto_Sans_JP } from 'next/font/google';
 import './globals.css';
@@ -24,7 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSansJP.className} m-0`}>{children}</body>
+      <body className={`${notoSansJP.className} m-0`}>
+        <AppGlobalContextProvider>{children}</AppGlobalContextProvider>
+      </body>
     </html>
   );
 }
