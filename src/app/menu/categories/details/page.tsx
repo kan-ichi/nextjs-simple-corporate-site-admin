@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function CategoryDetailsPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +35,7 @@ export default function CategoryDetailsPage() {
   const fetchCategoryData = async (convertedId: string) => {
     setIsLoading(true);
     try {
-      const category = await new DalCategory({ appGlobalContextValue }).getCategoryById(convertedId);
+      const category = await new DalCategory().getCategoryById(convertedId);
       if (!category) {
         message.error('カテゴリーを取得できません');
         router.push('/menu/categories');
@@ -57,7 +57,7 @@ export default function CategoryDetailsPage() {
         ...values,
         id,
       };
-      await new DalCategory({ appGlobalContextValue }).updateCategory(updatedCategory);
+      await new DalCategory().updateCategory(updatedCategory);
       message.success('カテゴリーが正常に更新されました');
       router.push('/menu/categories');
     } catch (error) {
@@ -79,7 +79,7 @@ export default function CategoryDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await new DalCategory({ appGlobalContextValue }).deleteCategory(id);
+          await new DalCategory().deleteCategory(id);
           message.success('カテゴリーが正常に削除されました');
           router.push('/menu/categories');
         } catch (error) {

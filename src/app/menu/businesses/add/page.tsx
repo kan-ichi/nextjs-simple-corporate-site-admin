@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AddBusinessPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,10 +24,10 @@ export default function AddBusinessPage() {
         logo_url: values.logo_url || '',
         service_url: values.service_url || '',
       };
-      const addedRecord = await new DalBusiness({ appGlobalContextValue }).addBusiness(businessData);
+      const addedRecord = await new DalBusiness().addBusiness(businessData);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await new DalBusiness({ appGlobalContextValue }).updateBusiness({
+        await new DalBusiness().updateBusiness({
           ...addedRecord,
           imagefile_url: uploadedImageUrl,
         });

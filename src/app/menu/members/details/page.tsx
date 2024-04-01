@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function MemberDetailsPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function MemberDetailsPage() {
   const fetchMemberData = async (convertedId: string) => {
     setIsLoading(true);
     try {
-      const member = await new DalMember({ appGlobalContextValue }).getMemberById(convertedId);
+      const member = await new DalMember().getMemberById(convertedId);
       if (!member) {
         message.error('メンバーを取得できません');
         router.push('/menu/members');
@@ -72,7 +72,7 @@ export default function MemberDetailsPage() {
         imagefile_url: uploadedImageUrl,
         id,
       };
-      await new DalMember({ appGlobalContextValue }).updateMember(updatedMember);
+      await new DalMember().updateMember(updatedMember);
       message.success('メンバーが正常に更新されました');
       router.push('/menu/members');
     } catch (error) {
@@ -94,7 +94,7 @@ export default function MemberDetailsPage() {
       onOk: async () => {
         try {
           FirebaseStorage.deleteImageFile(id);
-          await new DalMember({ appGlobalContextValue }).deleteMember(id);
+          await new DalMember().deleteMember(id);
           message.success('メンバーが正常に削除されました');
           router.push('/menu/members');
         } catch (error) {

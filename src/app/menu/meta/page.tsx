@@ -6,7 +6,7 @@ import { Button, Form, Input, message } from 'antd';
 import { useEffect, useState } from 'react';
 
 export default function MetaForm() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const [metaData, setMetaData] = useState<MetaRecord | null>(null);
 
@@ -16,7 +16,7 @@ export default function MetaForm() {
 
   const fetchMetaData = async () => {
     try {
-      const data = await new DalMeta({ appGlobalContextValue }).getMeta();
+      const data = await new DalMeta().getMeta();
       if (data) {
         setMetaData(data);
         form.setFieldsValue(data);
@@ -28,7 +28,7 @@ export default function MetaForm() {
 
   const handleSubmit = async (values: Meta) => {
     try {
-      await new DalMeta({ appGlobalContextValue }).upsertMeta({
+      await new DalMeta().upsertMeta({
         ...values,
         title: values.title || '',
         description: values.description || '',

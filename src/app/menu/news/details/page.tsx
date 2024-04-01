@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 const { Option } = Select;
 
 export default function NewsDetailsPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +48,7 @@ export default function NewsDetailsPage() {
   const fetchNewsData = async (convertedId: string) => {
     setIsLoading(true);
     try {
-      const news = await new DalNews({ appGlobalContextValue }).getNewsById(convertedId);
+      const news = await new DalNews().getNewsById(convertedId);
       if (!news) {
         message.error('ニュースを取得できません');
         router.push('/menu/news');
@@ -68,7 +68,7 @@ export default function NewsDetailsPage() {
    */
   const fetchCategories = async () => {
     try {
-      const fetchedCategories = await new DalCategory({ appGlobalContextValue }).getAllCategory();
+      const fetchedCategories = await new DalCategory().getAllCategory();
       setCategoryRecords(fetchedCategories);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
@@ -91,7 +91,7 @@ export default function NewsDetailsPage() {
         imagefile_url: uploadedImageUrl,
         id,
       };
-      await new DalNews({ appGlobalContextValue }).updateNews(updatedNews);
+      await new DalNews().updateNews(updatedNews);
       message.success('ニュースが正常に更新されました');
       router.push('/menu/news');
     } catch (error) {
@@ -113,7 +113,7 @@ export default function NewsDetailsPage() {
       onOk: async () => {
         try {
           FirebaseStorage.deleteImageFile(id);
-          await new DalNews({ appGlobalContextValue }).deleteNews(id);
+          await new DalNews().deleteNews(id);
           message.success('ニュースが正常に削除されました');
           router.push('/menu/news');
         } catch (error) {

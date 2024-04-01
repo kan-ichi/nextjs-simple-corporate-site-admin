@@ -6,7 +6,7 @@ import { Button, Form, Input, Switch, message } from 'antd';
 import { useEffect, useState } from 'react';
 
 export default function TopPageForm() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const [isHiringVisible, setIsHiringVisible] = useState(false);
   const [isMemberVisible, setIsMemberVisible] = useState(false);
@@ -18,7 +18,7 @@ export default function TopPageForm() {
 
   const fetchTopPageData = async () => {
     try {
-      const data = await new DalTopPage({ appGlobalContextValue }).getTopPage();
+      const data = await new DalTopPage().getTopPage();
       if (data) {
         setTopPageData(data);
         form.setFieldsValue(data);
@@ -32,7 +32,7 @@ export default function TopPageForm() {
 
   const handleSubmit = async (values: TopPage & { is_hiring_visible: boolean; is_member_visible: boolean }) => {
     try {
-      await new DalTopPage({ appGlobalContextValue }).upsertTopPage({
+      await new DalTopPage().upsertTopPage({
         ...values,
         is_hiring_visible: isHiringVisible,
         is_member_visible: isMemberVisible,

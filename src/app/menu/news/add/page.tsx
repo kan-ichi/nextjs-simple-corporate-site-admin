@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 const { Option } = Select;
 
 export default function AddNewsPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function AddNewsPage() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const fetchedCategories = await new DalCategory({ appGlobalContextValue }).getAllCategory();
+      const fetchedCategories = await new DalCategory().getAllCategory();
       setCategoryRecords(fetchedCategories);
     };
     fetchCategories();
@@ -33,10 +33,10 @@ export default function AddNewsPage() {
   const handleSubmit = async (values: News) => {
     setIsLoading(true);
     try {
-      const addedRecord = await new DalNews({ appGlobalContextValue }).addNews(values);
+      const addedRecord = await new DalNews().addNews(values);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await new DalNews({ appGlobalContextValue }).updateNews({ ...addedRecord, imagefile_url: uploadedImageUrl });
+        await new DalNews().updateNews({ ...addedRecord, imagefile_url: uploadedImageUrl });
       }
       message.success('ニュースが正常に登録されました');
       form.resetFields();

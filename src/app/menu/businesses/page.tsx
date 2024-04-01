@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function BusinessListPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const router = useRouter();
   const [businessList, setBusinessList] = useState<BusinessRecord[]>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -19,7 +19,7 @@ export default function BusinessListPage() {
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
-        const businesses = await new DalBusiness({ appGlobalContextValue }).getAllBusiness();
+        const businesses = await new DalBusiness().getAllBusiness();
         setBusinessList(businesses);
       } catch (error) {
         console.error('Failed to fetch businesses:', error);
@@ -56,7 +56,7 @@ export default function BusinessListPage() {
       onOk: async () => {
         try {
           await FirebaseStorage.deleteImageFile(id);
-          await new DalBusiness({ appGlobalContextValue }).deleteBusiness(id);
+          await new DalBusiness().deleteBusiness(id);
           setBusinessList(businessList.filter((business) => business.id !== id));
           message.success('事業内容が正常に削除されました');
         } catch (error) {

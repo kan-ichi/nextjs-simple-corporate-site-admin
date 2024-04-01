@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AddCategoryPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const [form] = Form.useForm();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +16,7 @@ export default function AddCategoryPage() {
   const handleSubmit = async (values: Category) => {
     setIsLoading(true);
     try {
-      await new DalCategory({ appGlobalContextValue }).addCategory(values);
+      await new DalCategory().addCategory(values);
       message.success('カテゴリーが正常に登録されました');
       form.resetFields();
       router.push('/menu/categories');

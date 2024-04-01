@@ -12,10 +12,10 @@ export const AppGlobalContext = createContext<
  * グローバルな状態を表すコンテキストの値
  */
 export interface AppGlobalContextValue {
-  /**
-   * 本番環境の場合は true
-   */
-  isProduction: boolean;
+  // /**
+  //  * 本番環境の場合は true
+  //  */
+  // isProduction: boolean;
 }
 
 /**

@@ -1,5 +1,4 @@
 import { FIREBASE_REALTIME_DATABASE_COLLECTION_NAME } from '@/common/constants/firebaseRealtimeDatabase';
-import { AppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { TopPage, TopPageRecord } from '@/common/types/TopPage';
 import { FirebaseRealtimeDatabase } from '@/features/FirebaseRealtimeDatabase';
 
@@ -8,15 +7,15 @@ import { FirebaseRealtimeDatabase } from '@/features/FirebaseRealtimeDatabase';
  */
 export interface ConstructorArguments {
   dataTreeName?: string;
-  appGlobalContextValue?: AppGlobalContextValue;
+  isProduction?: boolean;
 }
 
 /**
  * TopPage データアクセスレイヤー
  */
 export class DalTopPage {
-  private options: ConstructorArguments;
-  constructor(options: ConstructorArguments) {
+  private options?: ConstructorArguments;
+  constructor(options?: ConstructorArguments) {
     this.options = options;
   }
 
@@ -26,7 +25,7 @@ export class DalTopPage {
   createFirebaseRealtimeDatabase() {
     return new FirebaseRealtimeDatabase({
       dataTreeName: this.options?.dataTreeName,
-      appGlobalContextValue: this.options?.appGlobalContextValue,
+      isProduction: this.options?.isProduction,
       collectionName: FIREBASE_REALTIME_DATABASE_COLLECTION_NAME.COLLECTION_TOP_PAGE,
     });
   }

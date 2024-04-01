@@ -1,5 +1,4 @@
 import { FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME } from '@/common/constants/firebaseRealtimeDatabase';
-import { AppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { RecordBase } from '@/common/types/RecordBase';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { FormatDateUtils } from '@/common/utils/FormatDateUtils';
@@ -10,7 +9,7 @@ import { child, endAt, get, getDatabase, orderByKey, query, ref, remove, set } f
  */
 export interface ConstructorArguments {
   dataTreeName?: string;
-  appGlobalContextValue?: AppGlobalContextValue;
+  isProduction?: boolean;
   collectionName: string;
 }
 
@@ -144,7 +143,7 @@ export class FirebaseRealtimeDatabase {
   getDataFullTreeName(options: ConstructorArguments): string {
     if (options.dataTreeName) {
       return `${options.dataTreeName}/${options.collectionName}`;
-    } else if (options?.appGlobalContextValue?.isProduction) {
+    } else if (options.isProduction) {
       return `${FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME.DATA_TREE_NAME_PRODUCTION}/${options.collectionName}`;
     } else {
       return `${FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME.DATA_TREE_NAME_STAGING}/${options.collectionName}`;

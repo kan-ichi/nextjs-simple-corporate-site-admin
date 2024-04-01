@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function NewsListPage() {
-  const [appGlobalContextValue] = useAppGlobalContextValue();
+  const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
   const router = useRouter();
   const [newsList, setNewsList] = useState<NewsRecord[]>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -23,7 +23,7 @@ export default function NewsListPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        let news = await new DalNews({ appGlobalContextValue }).getAllNews();
+        let news = await new DalNews().getAllNews();
         news.sort((a, b) => new Date(a.release_date).getTime() - new Date(b.release_date).getTime());
         setNewsList(news);
       } catch (error) {
@@ -31,7 +31,7 @@ export default function NewsListPage() {
       }
     };
     const fetchCategories = async () => {
-      const fetchedCategories = await new DalCategory({ appGlobalContextValue }).getAllCategory();
+      const fetchedCategories = await new DalCategory().getAllCategory();
       setCategoryRecords(fetchedCategories);
     };
     fetchNews();
@@ -66,7 +66,7 @@ export default function NewsListPage() {
       onOk: async () => {
         try {
           await FirebaseStorage.deleteImageFile(id);
-          await new DalNews({ appGlobalContextValue }).deleteNews(id);
+          await new DalNews().deleteNews(id);
           setNewsList(newsList.filter((news) => news.id !== id));
           message.success('ニュースが正常に削除されました');
         } catch (error) {
