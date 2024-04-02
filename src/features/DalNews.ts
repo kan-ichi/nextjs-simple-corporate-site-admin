@@ -39,6 +39,7 @@ export class DalNews {
       {
         ...data,
         release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
+        category_id: data.category_id || '',
       },
       id
     );
@@ -72,7 +73,11 @@ export class DalNews {
   async updateNews(data: NewsRecord): Promise<NewsRecord> {
     const dal = this.createFirebaseRealtimeDatabase();
     const record = await dal.updateRecord(
-      { ...data, release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date) },
+      {
+        ...data,
+        release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
+        category_id: data.category_id || '',
+      },
       data.id
     );
     return {
