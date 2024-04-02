@@ -52,7 +52,7 @@ export class DalTopPage {
   /**
    * DBの TopPage を更新します
    */
-  async upsertTopPage(data: TopPage): Promise<TopPageRecord> {
+  async upsertTopPage(data: TopPage, id?: string): Promise<TopPageRecord> {
     const dal = this.createFirebaseRealtimeDatabase();
     const is_hiring_visible = FirebaseRealtimeDatabase.convertBooleanToString(data.is_hiring_visible);
     const is_member_visible = FirebaseRealtimeDatabase.convertBooleanToString(data.is_member_visible);
@@ -62,7 +62,7 @@ export class DalTopPage {
     if (oldRecord) {
       newRecord = await dal.updateRecord({ ...oldRecord, ...data, is_hiring_visible, is_member_visible }, oldRecord.id);
     } else {
-      newRecord = await dal.addRecord({ ...data, is_hiring_visible, is_member_visible });
+      newRecord = await dal.addRecord({ ...data, is_hiring_visible, is_member_visible }, id);
     }
 
     return {

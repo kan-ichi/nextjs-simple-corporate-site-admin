@@ -33,12 +33,15 @@ export class DalNews {
   /**
    * News をDBに追加し、追加したレコードを返します
    */
-  async addNews(data: News): Promise<NewsRecord> {
+  async addNews(data: News, id?: string): Promise<NewsRecord> {
     const dal = this.createFirebaseRealtimeDatabase();
-    const record = await dal.addRecord({
-      ...data,
-      release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
-    });
+    const record = await dal.addRecord(
+      {
+        ...data,
+        release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
+      },
+      id
+    );
     return {
       ...record.recordBase,
       ...record.data,
@@ -76,6 +79,21 @@ export class DalNews {
       ...record.recordBase,
       ...record.data,
     };
+  }
+
+  /**
+   * DBの News を更新します（既存レコードが無ければ追加します）
+   */
+  async upsertNews(data: NewsRecord): Promise<NewsRecord> {
+    const dal = this.createFirebaseRealtimeDatabase();
+    const currentRecord = await dal.getRecordById(data.id);
+    let record = null;
+    if (currentRecord) {
+      record = await dal.updateRecord(data, data.id);
+    } else {
+      record = await dal.addRecord(data);
+    }
+    return { ...record.recordBase, ...record.data };
   }
 
   /**

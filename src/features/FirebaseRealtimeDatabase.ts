@@ -25,9 +25,9 @@ export class FirebaseRealtimeDatabase {
   /**
    * データをDBに追加し、追加したレコードを返します
    */
-  async addRecord<T>(data: T): Promise<{ recordBase: RecordBase; data: T }> {
+  async addRecord<T>(data: T, id?: string): Promise<{ recordBase: RecordBase; data: T }> {
     const dbRef = ref(getDatabase(), this.getDataFullTreeName(this.options));
-    const recordId = DbKeyUtils.generateDbKey();
+    const recordId = id || DbKeyUtils.generateDbKey();
     const recordRef = child(dbRef, recordId);
     const createDateTime = FirebaseRealtimeDatabase.convertDbKeyToDate(recordId);
     const addData = {

@@ -4,6 +4,8 @@ import { RecordBase } from './RecordBase';
  * トップページの型定義
  */
 export interface TopPage {
+  production_url: string;
+  staging_url: string;
   header_title: string;
   top_title: string;
   top_description: string;

@@ -52,6 +52,20 @@ export default function TopPageForm() {
         <h1 className="text-2xl font-bold mb-4">トップページ編集</h1>
         <Form form={form} onFinish={handleSubmit} initialValues={topPageData || {}}>
           <Form.Item
+            name="production_url"
+            label="本番環境URL"
+            rules={[{ required: true, message: '本番環境URLを入力してください' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="staging_url"
+            label="ステージング環境URL"
+            rules={[{ required: true, message: 'ステージング環境URLを入力してください' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             name="header_title"
             label="ヘッダータイトル"
             rules={[{ required: true, message: 'ヘッダータイトルを入力してください' }]}

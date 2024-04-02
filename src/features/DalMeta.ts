@@ -47,14 +47,14 @@ export class DalMeta {
   /**
    * DBの Meta を更新します
    */
-  async upsertMeta(data: Meta): Promise<MetaRecord> {
+  async upsertMeta(data: Meta, id?: string): Promise<MetaRecord> {
     let newRecord: any;
     const oldRecord = await this.getMeta();
     const dal = this.createFirebaseRealtimeDatabase();
     if (oldRecord) {
       newRecord = await dal.updateRecord({ ...oldRecord, ...data }, oldRecord.id);
     } else {
-      newRecord = await dal.addRecord({ ...data });
+      newRecord = await dal.addRecord({ ...data }, id);
     }
     return { ...newRecord.recordBase, ...newRecord.data };
   }

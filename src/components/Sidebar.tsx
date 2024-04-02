@@ -8,6 +8,7 @@ import {
   MenuUnfoldOutlined,
   NotificationOutlined,
   SolutionOutlined,
+  SyncOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 import { Modal } from 'antd';
@@ -123,6 +124,18 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
             <Link href="/menu/members" className="flex items-center px-4 py-2">
               <TeamOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
               {!collapsed && <span>メンバー一覧・編集</span>}
+            </Link>
+          </li>
+          <li
+            className={`${
+              pathname === '/menu/deployment' ? 'bg-gray-400 dark:bg-gray-600' : ''
+            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
+              collapsed ? 'justify-center' : ''
+            }`}
+          >
+            <Link href="/menu/deployment" className="flex items-center px-4 py-2">
+              <SyncOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
+              {!collapsed && <span>本番環境展開</span>}
             </Link>
           </li>
         </ul>

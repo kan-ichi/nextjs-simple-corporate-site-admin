@@ -33,9 +33,9 @@ export class DalMember {
   /**
    * Member をDBに追加し、追加したレコードを返します
    */
-  async addMember(data: Member): Promise<MemberRecord> {
+  async addMember(data: Member, id?: string): Promise<MemberRecord> {
     const dal = this.createFirebaseRealtimeDatabase();
-    const record = await dal.addRecord(data);
+    const record = await dal.addRecord(data, id);
     return { ...record.recordBase, ...record.data };
   }
 
@@ -63,6 +63,21 @@ export class DalMember {
   async updateMember(data: MemberRecord): Promise<MemberRecord> {
     const dal = this.createFirebaseRealtimeDatabase();
     const record = await dal.updateRecord(data, data.id);
+    return { ...record.recordBase, ...record.data };
+  }
+
+  /**
+   * DBの Member を更新します（既存レコードが無ければ追加します）
+   */
+  async upsertMember(data: MemberRecord): Promise<MemberRecord> {
+    const dal = this.createFirebaseRealtimeDatabase();
+    const currentRecord = await dal.getRecordById(data.id);
+    let record = null;
+    if (currentRecord) {
+      record = await dal.updateRecord(data, data.id);
+    } else {
+      record = await dal.addRecord(data);
+    }
     return { ...record.recordBase, ...record.data };
   }
 
