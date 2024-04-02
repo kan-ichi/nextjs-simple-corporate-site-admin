@@ -33,10 +33,11 @@ export default function AddNewsPage() {
   const handleSubmit = async (values: News) => {
     setIsLoading(true);
     try {
-      const addedRecord = await new DalNews().addNews(values);
+      const dal = new DalNews();
+      const addedRecord = await dal.addNews(values);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await new DalNews().updateNews({ ...addedRecord, imagefile_url: uploadedImageUrl });
+        await dal.updateNews({ ...addedRecord, imagefile_url: uploadedImageUrl });
       }
       message.success('ニュースが正常に登録されました');
       form.resetFields();

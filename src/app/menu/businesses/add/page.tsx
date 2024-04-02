@@ -24,13 +24,11 @@ export default function AddBusinessPage() {
         logo_url: values.logo_url || '',
         service_url: values.service_url || '',
       };
-      const addedRecord = await new DalBusiness().addBusiness(businessData);
+      const dal = new DalBusiness();
+      const addedRecord = await dal.addBusiness(businessData);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, addedRecord.id);
-        await new DalBusiness().updateBusiness({
-          ...addedRecord,
-          imagefile_url: uploadedImageUrl,
-        });
+        await dal.updateBusiness({ ...addedRecord, imagefile_url: uploadedImageUrl });
       }
 
       message.success('事業内容が正常に登録されました');
