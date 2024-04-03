@@ -65,7 +65,7 @@ export default function NewsListPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await FirebaseStorage.deleteImageFile(id);
+          await new FirebaseStorage().deleteImageFile(id);
           await new DalNews().deleteNews(id);
           setNewsList(newsList.filter((news) => news.id !== id));
           message.success('ニュースが正常に削除されました');

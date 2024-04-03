@@ -77,13 +77,14 @@ export default function NewsDetailsPage() {
 
   const handleUpdate = async (values: NewsRecord) => {
     setIsLoading(true);
-    let uploadedImageUrl: string = (await FirebaseStorage.getImageFileURL(id)) || '';
+    const fileManager = new FirebaseStorage();
+    let uploadedImageUrl: string = (await fileManager.getImageFileURL(id)) || '';
     try {
       if (isImageFileAdded && uploadedFile) {
-        uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
+        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
-        await FirebaseStorage.deleteImageFile(id);
+        await fileManager.deleteImageFile(id);
         uploadedImageUrl = '';
       }
       const updatedNews: NewsRecord = {
@@ -112,7 +113,7 @@ export default function NewsDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          FirebaseStorage.deleteImageFile(id);
+          await new FirebaseStorage().deleteImageFile(id);
           await new DalNews().deleteNews(id);
           message.success('ニュースが正常に削除されました');
           router.push('/menu/news');

@@ -58,13 +58,14 @@ export default function BusinessDetailsPage() {
 
   const handleUpdate = async (values: BusinessRecord) => {
     setIsLoading(true);
-    let uploadedImageUrl: string = (await FirebaseStorage.getImageFileURL(id)) || '';
+    const fileManager = new FirebaseStorage();
+    let uploadedImageUrl: string = (await fileManager.getImageFileURL(id)) || '';
     try {
       if (isImageFileAdded && uploadedFile) {
-        uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
+        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
-        await FirebaseStorage.deleteImageFile(id);
+        await fileManager.deleteImageFile(id);
         uploadedImageUrl = '';
       }
       const updatedBusiness: BusinessRecord = {
@@ -95,7 +96,7 @@ export default function BusinessDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          FirebaseStorage.deleteImageFile(id);
+          new FirebaseStorage().deleteImageFile(id);
           await new DalBusiness().deleteBusiness(id);
           message.success('事業内容が正常に削除されました');
           router.push('/menu/businesses');

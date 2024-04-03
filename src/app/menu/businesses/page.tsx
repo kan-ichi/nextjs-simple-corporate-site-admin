@@ -55,7 +55,7 @@ export default function BusinessListPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await FirebaseStorage.deleteImageFile(id);
+          await new FirebaseStorage().deleteImageFile(id);
           await new DalBusiness().deleteBusiness(id);
           setBusinessList(businessList.filter((business) => business.id !== id));
           message.success('事業内容が正常に削除されました');

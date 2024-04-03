@@ -58,13 +58,14 @@ export default function MemberDetailsPage() {
 
   const handleUpdate = async (values: MemberRecord) => {
     setIsLoading(true);
-    let uploadedImageUrl: string = (await FirebaseStorage.getImageFileURL(id)) || '';
+    const fileManager = new FirebaseStorage();
+    let uploadedImageUrl: string = (await fileManager.getImageFileURL(id)) || '';
     try {
       if (isImageFileAdded && uploadedFile) {
-        uploadedImageUrl = await FirebaseStorage.uploadImageFile(uploadedFile, id);
+        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, id);
       }
       if (isImageFileDeleted) {
-        await FirebaseStorage.deleteImageFile(id);
+        await fileManager.deleteImageFile(id);
         uploadedImageUrl = '';
       }
       const updatedMember: MemberRecord = {
@@ -93,7 +94,7 @@ export default function MemberDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          FirebaseStorage.deleteImageFile(id);
+          await new FirebaseStorage().deleteImageFile(id);
           await new DalMember().deleteMember(id);
           message.success('メンバーが正常に削除されました');
           router.push('/menu/members');

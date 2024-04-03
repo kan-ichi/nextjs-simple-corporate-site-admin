@@ -23,7 +23,7 @@ export default function UploadImage({
   // 既存の画像ファイルを表示します
   useEffect(() => {
     if (!existingFileName) return;
-    FirebaseStorage.getImageFileURL(existingFileName).then((url) => {
+    new FirebaseStorage().getImageFileURL(existingFileName).then((url) => {
       if (url) {
         setImageFileList([
           {
