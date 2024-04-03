@@ -5,11 +5,14 @@ import { DalMeta } from '@/features/DalMeta';
 import { DalNews } from '@/features/DalNews';
 import { DalTopPage } from '@/features/DalTopPage';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
+import { UploadFile } from 'antd';
 
 /**
  * デプロイ管理
  */
 export module DeploymentManager {
+  const productionFileManager = new FirebaseStorage({ isProduction: true });
+
   /**
    * 全てのデータを本番にデプロイします
    * */
@@ -32,7 +35,7 @@ export module DeploymentManager {
     const oldProductionRecords = await productionDal.getAllBusiness();
     const stagingRecords = await stagingDal.getAllBusiness();
 
-    const allRecords = removeDuplicates([...oldProductionRecords, ...stagingRecords]);
+    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -41,8 +44,15 @@ export module DeploymentManager {
         } else {
           productionDal.addBusiness(record, recordId);
         }
+        const uploadFile = createUploadFile(record);
+        if (uploadFile) {
+          const file = convertUploadFileToFile(uploadFile);
+          await productionFileManager.uploadImageFile(file, file.fileName);
+        } else {
+          await productionFileManager.deleteImageFile(recordId);
+        }
       } else {
-        await new FirebaseStorage().deleteImageFile(recordId);
+        await productionFileManager.deleteImageFile(recordId);
         productionDal.deleteBusiness(recordId);
       }
     }
@@ -58,7 +68,7 @@ export module DeploymentManager {
     const oldProductionRecords = await productionDal.getAllCategory();
     const stagingRecords = await stagingDal.getAllCategory();
 
-    const allRecords = removeDuplicates([...oldProductionRecords, ...stagingRecords]);
+    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -83,7 +93,7 @@ export module DeploymentManager {
     const oldProductionRecords = await productionDal.getAllMember();
     const stagingRecords = await stagingDal.getAllMember();
 
-    const allRecords = removeDuplicates([...oldProductionRecords, ...stagingRecords]);
+    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -92,8 +102,15 @@ export module DeploymentManager {
         } else {
           productionDal.addMember(record, recordId);
         }
+        const uploadFile = createUploadFile(record);
+        if (uploadFile) {
+          const file = convertUploadFileToFile(uploadFile);
+          await productionFileManager.uploadImageFile(file, file.fileName);
+        } else {
+          await productionFileManager.deleteImageFile(recordId);
+        }
       } else {
-        await new FirebaseStorage().deleteImageFile(recordId);
+        await productionFileManager.deleteImageFile(recordId);
         productionDal.deleteMember(recordId);
       }
     }
@@ -120,7 +137,7 @@ export module DeploymentManager {
     const oldProductionRecords = await productionDal.getAllNews();
     const stagingRecords = await stagingDal.getAllNews();
 
-    const allRecords = removeDuplicates([...oldProductionRecords, ...stagingRecords]);
+    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -129,8 +146,15 @@ export module DeploymentManager {
         } else {
           productionDal.addNews(record, recordId);
         }
+        const uploadFile = createUploadFile(record);
+        if (uploadFile) {
+          const file = convertUploadFileToFile(uploadFile);
+          await productionFileManager.uploadImageFile(file, file.fileName);
+        } else {
+          await productionFileManager.deleteImageFile(recordId);
+        }
       } else {
-        await new FirebaseStorage().deleteImageFile(recordId);
+        await productionFileManager.deleteImageFile(recordId);
         productionDal.deleteNews(recordId);
       }
     }
@@ -148,7 +172,7 @@ export module DeploymentManager {
   }
 
   /**
-   * 重複レコードを削除します
+   * 重複レコードを削除します（引数をスプレッド構文で指定した場合は、先勝ちになるので注意）
    */
   function removeDuplicates<T extends { id: string }>(records: T[]): T[] {
     const result: T[] = [];
@@ -162,5 +186,28 @@ export module DeploymentManager {
     }
 
     return result;
+  }
+
+  /**
+   * レコードから、UploadFile を生成します
+   */
+  function createUploadFile(stagingRecord: { id: string; imagefile_url?: string }): UploadFile | null {
+    if (!stagingRecord.imagefile_url) return null;
+    return {
+      uid: stagingRecord.id,
+      name: stagingRecord.id,
+      status: 'done',
+      url: stagingRecord.imagefile_url,
+    };
+  }
+
+  /**
+   * UploadFile を File と その名前 に変換します
+   */
+  function convertUploadFileToFile(uploadFile: UploadFile): File & { fileName: string } {
+    return {
+      ...(uploadFile.originFileObj as File),
+      fileName: uploadFile.name,
+    };
   }
 }
