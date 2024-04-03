@@ -1,15 +1,21 @@
 'use client';
 import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { TopPageRecord } from '@/common/types/TopPage';
+import { DalBusiness } from '@/features/DalBusiness';
 import { DalTopPage } from '@/features/DalTopPage';
 import { DeploymentManager } from '@/features/DeploymentManager';
-import { WarningOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Modal, Space, Spin } from 'antd';
+import { FirebaseStorage } from '@/features/FirebaseStorage';
+import { LoadingOutlined, WarningOutlined } from '@ant-design/icons';
+import { Button, Modal, Space, UploadFile } from 'antd';
 import { useEffect, useState } from 'react';
 
 export default function DeploymentPage() {
   const [appGlobalContextValue, setAppGlobalContextValue] = useAppGlobalContextValue();
+
+  const productionFileManager = new FirebaseStorage({ isProduction: true });
+
   const [topPageRecord, setTopPageRecord] = useState<TopPageRecord | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
@@ -28,6 +34,37 @@ export default function DeploymentPage() {
     }
   };
 
+  const stagingDal = new DalBusiness({ isProduction: false });
+
+  const loadImageFiles = async (): Promise<UploadFile[]> => {
+    const stagingRecords = await stagingDal.getAllBusiness();
+    const files: UploadFile[] = [];
+    for (const stagingRecord of stagingRecords) {
+      const url = stagingRecord.imagefile_url;
+      if (url) {
+        files.push({
+          uid: stagingRecord.id,
+          name: stagingRecord.id,
+          status: 'done',
+          url: url,
+        });
+      }
+    }
+    return files;
+  };
+
+  const createNewFileList = async (files: UploadFile[]): Promise<(File & { name: string })[]> => {
+    let newFileList: (File & { name: string })[] = [];
+    for (const imageFile of files) {
+      const uploadFile = files.find((f) => f.uid === imageFile.uid);
+      newFileList.push({
+        ...(imageFile.originFileObj as File),
+        name: uploadFile ? uploadFile.name : '',
+      });
+    }
+    return newFileList;
+  };
+
   const handleDeployToProduction = () => {
     setIsConfirmModalOpen(true);
   };
@@ -35,6 +72,16 @@ export default function DeploymentPage() {
   const confirmDeployToProduction = async () => {
     setIsLoadingModalOpen(true);
     setIsLoading(true);
+
+    const temp = await loadImageFiles();
+    const temp2 = await createNewFileList(temp);
+
+    temp2.forEach(async (item) => {
+      const file = item;
+      const fileName = item.name;
+      const uploadedImageUrl = await productionFileManager.uploadImageFile(file, fileName);
+    });
+
     await DeploymentManager.deployToProduction();
     setIsLoading(false);
     setIsLoadingModalOpen(false);
