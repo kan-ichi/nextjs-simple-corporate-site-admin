@@ -42,7 +42,7 @@ export module DeploymentManager {
           productionDal.addBusiness(record, recordId);
         }
       } else {
-        FirebaseStorage.deleteImageFile(recordId);
+        await new FirebaseStorage().deleteImageFile(recordId);
         productionDal.deleteBusiness(recordId);
       }
     }
@@ -93,7 +93,7 @@ export module DeploymentManager {
           productionDal.addMember(record, recordId);
         }
       } else {
-        FirebaseStorage.deleteImageFile(recordId);
+        await new FirebaseStorage().deleteImageFile(recordId);
         productionDal.deleteMember(recordId);
       }
     }
@@ -130,7 +130,7 @@ export module DeploymentManager {
           productionDal.addNews(record, recordId);
         }
       } else {
-        FirebaseStorage.deleteImageFile(recordId);
+        await new FirebaseStorage().deleteImageFile(recordId);
         productionDal.deleteNews(recordId);
       }
     }
