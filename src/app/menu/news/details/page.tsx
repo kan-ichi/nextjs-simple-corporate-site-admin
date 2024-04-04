@@ -78,13 +78,13 @@ export default function NewsDetailsPage() {
   const handleUpdate = async (values: NewsRecord) => {
     setIsLoading(true);
     const fileManager = new FirebaseStorage();
-    let uploadedImageUrl: string = (await fileManager.getImageFileURL(id)) || '';
+    let uploadedImageUrl = values.imagefile_url;
     try {
       if (isImageFileAdded && uploadedFile) {
-        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, id);
+        const fileName = DbKeyUtils.reGenerateDbKey(id);
+        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, fileName);
       }
       if (isImageFileDeleted) {
-        await fileManager.deleteImageFile(id);
         uploadedImageUrl = '';
       }
       const updatedNews: NewsRecord = {
@@ -113,7 +113,6 @@ export default function NewsDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await new FirebaseStorage().deleteImageFile(id);
           await new DalNews().deleteNews(id);
           message.success('ニュースが正常に削除されました');
           router.push('/menu/news');
@@ -186,7 +185,7 @@ export default function NewsDetailsPage() {
             <Input.TextArea rows={6} />
           </Form.Item>
           <UploadImage
-            existingFileName={id}
+            existingImagefileUrl={newsData.imagefile_url}
             isImageFileAddedCallback={(value: boolean) => setIsImageFileAdded(value)}
             isImageFileDeletedCallback={(value: boolean) => setIsImageFileDeleted(value)}
             fileUploadedCallback={(value: File | null) => setUploadedFile(value)}

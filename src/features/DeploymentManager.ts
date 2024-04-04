@@ -5,37 +5,35 @@ import { DalMeta } from '@/features/DalMeta';
 import { DalNews } from '@/features/DalNews';
 import { DalTopPage } from '@/features/DalTopPage';
 import { FirebaseStorage } from '@/features/FirebaseStorage';
-import { UploadFile } from 'antd';
 
 /**
  * デプロイ管理
  */
-export module DeploymentManager {
-  const productionFileManager = new FirebaseStorage({ isProduction: true });
-
+export class DeploymentManager {
   /**
-   * 全てのデータを本番にデプロイします
+   * 全てのデータ・画像を本番にデプロイします
    * */
-  export async function deployToProduction(): Promise<void> {
-    await deployBusinessToProduction();
-    await deployCategoryToProduction();
-    await deployMemberToProduction();
-    await deployMetaToProduction();
-    await deployNewsToProduction();
-    await deployTopPageToProduction();
+  async deployToProduction(): Promise<void> {
+    await this.deployBusinessToProduction();
+    await this.deployCategoryToProduction();
+    await this.deployMemberToProduction();
+    await this.deployMetaToProduction();
+    await this.deployNewsToProduction();
+    await this.deployTopPageToProduction();
+    await this.adjustImageFile();
   }
 
   /**
    * Business を本番にデプロイします
    */
-  async function deployBusinessToProduction(): Promise<void> {
+  private async deployBusinessToProduction(): Promise<void> {
     const productionDal = new DalBusiness({ isProduction: true });
     const stagingDal = new DalBusiness({ isProduction: false });
 
     const oldProductionRecords = await productionDal.getAllBusiness();
     const stagingRecords = await stagingDal.getAllBusiness();
 
-    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
+    const allRecords = this.removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -44,15 +42,7 @@ export module DeploymentManager {
         } else {
           productionDal.addBusiness(record, recordId);
         }
-        const uploadFile = createUploadFile(record);
-        if (uploadFile) {
-          const file = convertUploadFileToFile(uploadFile);
-          await productionFileManager.uploadImageFile(file, file.fileName);
-        } else {
-          await productionFileManager.deleteImageFile(recordId);
-        }
       } else {
-        await productionFileManager.deleteImageFile(recordId);
         productionDal.deleteBusiness(recordId);
       }
     }
@@ -61,14 +51,14 @@ export module DeploymentManager {
   /**
    * Category を本番にデプロイします
    */
-  async function deployCategoryToProduction(): Promise<void> {
+  private async deployCategoryToProduction(): Promise<void> {
     const productionDal = new DalCategory({ isProduction: true });
     const stagingDal = new DalCategory({ isProduction: false });
 
     const oldProductionRecords = await productionDal.getAllCategory();
     const stagingRecords = await stagingDal.getAllCategory();
 
-    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
+    const allRecords = this.removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -86,14 +76,14 @@ export module DeploymentManager {
   /**
    * Member を本番にデプロイします
    */
-  async function deployMemberToProduction(): Promise<void> {
+  private async deployMemberToProduction(): Promise<void> {
     const productionDal = new DalMember({ isProduction: true });
     const stagingDal = new DalMember({ isProduction: false });
 
     const oldProductionRecords = await productionDal.getAllMember();
     const stagingRecords = await stagingDal.getAllMember();
 
-    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
+    const allRecords = this.removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -102,15 +92,7 @@ export module DeploymentManager {
         } else {
           productionDal.addMember(record, recordId);
         }
-        const uploadFile = createUploadFile(record);
-        if (uploadFile) {
-          const file = convertUploadFileToFile(uploadFile);
-          await productionFileManager.uploadImageFile(file, file.fileName);
-        } else {
-          await productionFileManager.deleteImageFile(recordId);
-        }
       } else {
-        await productionFileManager.deleteImageFile(recordId);
         productionDal.deleteMember(recordId);
       }
     }
@@ -119,7 +101,7 @@ export module DeploymentManager {
   /**
    * Meta を本番にデプロイします
    */
-  async function deployMetaToProduction(): Promise<void> {
+  private async deployMetaToProduction(): Promise<void> {
     const productionDal = new DalMeta({ isProduction: true });
     const stagingDal = new DalMeta({ isProduction: false });
 
@@ -130,14 +112,14 @@ export module DeploymentManager {
   /**
    * News を本番にデプロイします
    */
-  async function deployNewsToProduction(): Promise<void> {
+  private async deployNewsToProduction(): Promise<void> {
     const productionDal = new DalNews({ isProduction: true });
     const stagingDal = new DalNews({ isProduction: false });
 
     const oldProductionRecords = await productionDal.getAllNews();
     const stagingRecords = await stagingDal.getAllNews();
 
-    const allRecords = removeDuplicates([...stagingRecords, ...oldProductionRecords]);
+    const allRecords = this.removeDuplicates([...stagingRecords, ...oldProductionRecords]);
     for (const record of allRecords) {
       const recordId = record.id;
       if (stagingRecords.some((r) => r.id === recordId)) {
@@ -146,15 +128,7 @@ export module DeploymentManager {
         } else {
           productionDal.addNews(record, recordId);
         }
-        const uploadFile = createUploadFile(record);
-        if (uploadFile) {
-          const file = convertUploadFileToFile(uploadFile);
-          await productionFileManager.uploadImageFile(file, file.fileName);
-        } else {
-          await productionFileManager.deleteImageFile(recordId);
-        }
       } else {
-        await productionFileManager.deleteImageFile(recordId);
         productionDal.deleteNews(recordId);
       }
     }
@@ -163,7 +137,7 @@ export module DeploymentManager {
   /**
    * TopPage を本番にデプロイします
    */
-  async function deployTopPageToProduction(): Promise<void> {
+  private async deployTopPageToProduction(): Promise<void> {
     const productionDal = new DalTopPage({ isProduction: true });
     const stagingDal = new DalTopPage({ isProduction: false });
 
@@ -174,7 +148,7 @@ export module DeploymentManager {
   /**
    * 重複レコードを削除します（引数をスプレッド構文で指定した場合は、先勝ちになるので注意）
    */
-  function removeDuplicates<T extends { id: string }>(records: T[]): T[] {
+  private removeDuplicates<T extends { id: string }>(records: T[]): T[] {
     const result: T[] = [];
     const idSet = new Set<string>();
 
@@ -189,25 +163,50 @@ export module DeploymentManager {
   }
 
   /**
-   * レコードから、UploadFile を生成します
+   * 各DBで使用している画像ファイルを検索し、それ以外の不要な画像ファイルを削除します
    */
-  function createUploadFile(stagingRecord: { id: string; imagefile_url?: string }): UploadFile | null {
-    if (!stagingRecord.imagefile_url) return null;
-    return {
-      uid: stagingRecord.id,
-      name: stagingRecord.id,
-      status: 'done',
-      url: stagingRecord.imagefile_url,
-    };
-  }
+  private async adjustImageFile() {
+    /**
+     * 現在ストレージに存在するすべての画像ファイル名のリスト
+     */
+    const allImageFileNames = await new FirebaseStorage().getAllImageFileNames();
 
-  /**
-   * UploadFile を File と その名前 に変換します
-   */
-  function convertUploadFileToFile(uploadFile: UploadFile): File & { fileName: string } {
-    return {
-      ...(uploadFile.originFileObj as File),
-      fileName: uploadFile.name,
+    /**
+     * アクティブな画像ファイル名のリスト
+     */
+    let activeImageFileNames = new Set<string>();
+
+    /**
+     * imagefile_url のファイル名を取得し、アクティブな画像ファイル名のリストに追加します
+     */
+    const processRecord = (record: { imagefile_url?: string }) => {
+      if (record.imagefile_url) {
+        activeImageFileNames.add(FirebaseStorage.convertUrlToFileName(record.imagefile_url));
+      }
     };
+
+    /**
+     * DBを読み、ファイル名をアクティブな画像ファイル名のリストに追加します
+     */
+    {
+      await new DalBusiness({ isProduction: true }).getAllBusiness().then((records) => records.forEach(processRecord));
+      await new DalBusiness().getAllBusiness().then((records) => records.forEach(processRecord));
+      await new DalMember({ isProduction: true }).getAllMember().then((records) => records.forEach(processRecord));
+      await new DalMember().getAllMember().then((records) => records.forEach(processRecord));
+      await new DalNews({ isProduction: true }).getAllNews().then((records) => records.forEach(processRecord));
+      await new DalNews().getAllNews().then((records) => records.forEach(processRecord));
+    }
+
+    /**
+     * 削除対象の画像ファイル名のリスト
+     */
+    const deleteImageFileNames = new Set([...allImageFileNames].filter((elem) => !activeImageFileNames.has(elem)));
+
+    /**
+     * 画像ファイルを削除します
+     */
+    deleteImageFileNames.forEach(async (fileName) => {
+      await new FirebaseStorage().deleteImageFile(fileName);
+    });
   }
 }

@@ -1,9 +1,9 @@
-import { FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME } from '@/common/constants/firebaseRealtimeDatabase';
 import {
   StorageReference,
   deleteObject,
   getDownloadURL,
   getStorage,
+  listAll,
   ref,
   uploadBytesResumable,
 } from 'firebase/storage';
@@ -13,7 +13,6 @@ import {
  */
 export interface ConstructorArguments {
   dataTreeName?: string;
-  isProduction?: boolean;
 }
 
 /**
@@ -70,6 +69,20 @@ export class FirebaseStorage {
   }
 
   /**
+   * すべてのファイルの 名前 を Firebase Storage の images ディレクトリから取得します
+   */
+  async getAllImageFileNames(): Promise<string[]> {
+    const storage = getStorage();
+    const listRef = ref(storage, this.getDataFullTreeName());
+    const list = await listAll(listRef);
+    const urls: string[] = [];
+    for (const item of list.items) {
+      urls.push(item.name);
+    }
+    return urls;
+  }
+
+  /**
    * ファイルを Firebase Storage の images ディレクトリから削除します
    */
   async deleteImageFile(fileName: string) {
@@ -92,23 +105,39 @@ export class FirebaseStorage {
   }
 
   /**
-   * 各状態を判定し StorageReference を生成します。
-   */
-  private createFileRef(fileName: string): StorageReference {
-    const storage = getStorage();
-    return ref(storage, this.getDataFullTreeName(fileName));
-  }
-
-  /**
    * 各状態を判定し、データツリー名を取得します
    */
-  private getDataFullTreeName(fileName: string): string {
+  private getDataFullTreeName(fileName?: string): string {
     if (this.options?.dataTreeName) {
       return `${this.options.dataTreeName}/${fileName}`;
-    } else if (this.options?.isProduction) {
-      return `${FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME.DATA_TREE_NAME_PRODUCTION}/images/${fileName}`;
+    } else if (fileName) {
+      return `/images/${fileName}`;
     } else {
-      return `${FIREBASE_REALTIME_DATABASE_DATA_TREE_NAME.DATA_TREE_NAME_STAGING}/images/${fileName}`;
+      return `/images`;
     }
+  }
+}
+
+/**
+ * Firebase Storage 関連の機能
+ */
+export module FirebaseStorage {
+  /**
+   * URLからファイル名を取得します
+   */
+  export function convertUrlToFileName(url: string): string {
+    const startToken = '/images%2F';
+    const endToken = '?';
+
+    const startIndex = url.indexOf(startToken);
+    if (startIndex === -1) return '';
+    let endIndex = url.indexOf(endToken, startIndex);
+    if (endIndex === -1) {
+      endIndex = url.length;
+    }
+
+    const idStartIndex = startIndex + startToken.length;
+    const idEndIndex = endIndex;
+    return url.substring(idStartIndex, idEndIndex);
   }
 }

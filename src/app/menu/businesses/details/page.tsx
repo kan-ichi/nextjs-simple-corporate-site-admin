@@ -59,13 +59,13 @@ export default function BusinessDetailsPage() {
   const handleUpdate = async (values: BusinessRecord) => {
     setIsLoading(true);
     const fileManager = new FirebaseStorage();
-    let uploadedImageUrl: string = (await fileManager.getImageFileURL(id)) || '';
+    let uploadedImageUrl = values.imagefile_url;
     try {
       if (isImageFileAdded && uploadedFile) {
-        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, id);
+        const fileName = DbKeyUtils.reGenerateDbKey(id);
+        uploadedImageUrl = await fileManager.uploadImageFile(uploadedFile, fileName);
       }
       if (isImageFileDeleted) {
-        await fileManager.deleteImageFile(id);
         uploadedImageUrl = '';
       }
       const updatedBusiness: BusinessRecord = {
@@ -96,7 +96,6 @@ export default function BusinessDetailsPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          new FirebaseStorage().deleteImageFile(id);
           await new DalBusiness().deleteBusiness(id);
           message.success('事業内容が正常に削除されました');
           router.push('/menu/businesses');
@@ -127,7 +126,7 @@ export default function BusinessDetailsPage() {
             <Input />
           </Form.Item>
           <UploadImage
-            existingFileName={id}
+            existingImagefileUrl={businessData.imagefile_url}
             isImageFileAddedCallback={(value: boolean) => setIsImageFileAdded(value)}
             isImageFileDeletedCallback={(value: boolean) => setIsImageFileDeleted(value)}
             fileUploadedCallback={(value: File | null) => setUploadedFile(value)}

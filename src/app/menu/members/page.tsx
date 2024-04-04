@@ -3,7 +3,6 @@ import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { MemberRecord } from '@/common/types/Member';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { DalMember } from '@/features/DalMember';
-import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Table, message } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -55,7 +54,6 @@ export default function MemberListPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await new FirebaseStorage().deleteImageFile(id);
           await new DalMember().deleteMember(id);
           setMemberList(memberList.filter((member) => member.id !== id));
           message.success('メンバーが正常に削除されました');

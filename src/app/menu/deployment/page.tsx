@@ -35,7 +35,7 @@ export default function DeploymentPage() {
   const confirmDeployToProduction = async () => {
     setIsLoadingModalOpen(true);
     setIsLoading(true);
-    await DeploymentManager.deployToProduction();
+    await new DeploymentManager().deployToProduction();
     setIsLoading(false);
     setIsLoadingModalOpen(false);
     setIsDeployedModalOpen(true);

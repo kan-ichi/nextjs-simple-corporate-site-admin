@@ -3,7 +3,6 @@ import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { BusinessRecord } from '@/common/types/Business';
 import { DbKeyUtils } from '@/common/utils/DbKeyUtils';
 import { DalBusiness } from '@/features/DalBusiness';
-import { FirebaseStorage } from '@/features/FirebaseStorage';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Table, message } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -55,7 +54,6 @@ export default function BusinessListPage() {
       maskClosable: true,
       onOk: async () => {
         try {
-          await new FirebaseStorage().deleteImageFile(id);
           await new DalBusiness().deleteBusiness(id);
           setBusinessList(businessList.filter((business) => business.id !== id));
           message.success('事業内容が正常に削除されました');

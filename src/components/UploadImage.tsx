@@ -6,14 +6,14 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { useEffect, useState } from 'react';
 
 interface UploadImageProps {
-  existingFileName?: string;
+  existingImagefileUrl?: string;
   isImageFileAddedCallback: (isImageFileAdded: boolean) => void;
   isImageFileDeletedCallback: (isImageFileDeleted: boolean) => void;
   fileUploadedCallback: (uploadedFile: File | null) => void;
 }
 
 export default function UploadImage({
-  existingFileName,
+  existingImagefileUrl,
   isImageFileAddedCallback,
   isImageFileDeletedCallback,
   fileUploadedCallback,
@@ -22,20 +22,16 @@ export default function UploadImage({
 
   // 既存の画像ファイルを表示します
   useEffect(() => {
-    if (!existingFileName) return;
-    new FirebaseStorage().getImageFileURL(existingFileName).then((url) => {
-      if (url) {
-        setImageFileList([
-          {
-            uid: '-1',
-            name: existingFileName,
-            status: 'done',
-            url: url,
-          },
-        ]);
-      }
-    });
-  }, [existingFileName]);
+    if (!existingImagefileUrl) return;
+    setImageFileList([
+      {
+        uid: '-1',
+        name: FirebaseStorage.convertUrlToFileName(existingImagefileUrl),
+        status: 'done',
+        url: existingImagefileUrl,
+      },
+    ]);
+  }, [existingImagefileUrl]);
 
   /**
    * プレビュー領域から画像ファイルを削除し、削除した旨をコールバック関数に通知します

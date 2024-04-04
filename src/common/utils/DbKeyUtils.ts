@@ -3,7 +3,7 @@
  */
 export module DbKeyUtils {
   /**
-   * DBキーを生成します。
+   * DBキーを生成します
    */
   export function generateDbKey(): string;
   export function generateDbKey(date: Date): string;
@@ -14,7 +14,15 @@ export module DbKeyUtils {
   }
 
   /**
-   * DBキーの日時部分を生成します。
+   * DBキーを再生成します
+   */
+  export function reGenerateDbKey(dbKey: string) {
+    const date = DbKeyUtils.extractDateFromDbKey(dbKey) || new Date();
+    return generateDbKey(date);
+  }
+
+  /**
+   * DBキーの日時部分を生成します
    **/
   export function generateDbKeyDateTimePart(date: Date) {
     const year = date.getFullYear();
@@ -28,7 +36,7 @@ export module DbKeyUtils {
   }
 
   /**
-   * DBキーから日時を抽出します。
+   * DBキーから日時を抽出します
    */
   export function extractDateFromDbKey(dbKey: string): Date | null {
     // 正しいDBキーのフォーマットかどうかを確認
