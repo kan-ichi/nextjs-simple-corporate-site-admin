@@ -14,8 +14,7 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: 'Nextjs Template',
-  description: 'Nextjs Template description.',
+  title: 'Webサイト管理',
 };
 
 export default function RootLayout({
