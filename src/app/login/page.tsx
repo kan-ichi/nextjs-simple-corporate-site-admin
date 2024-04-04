@@ -1,13 +1,17 @@
 'use client';
 import { Button, Form, Input, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
+import { USERNAME_PASSWORD_PAIRS } from '@/_DoNotCommit/env';
 
 export default function Login() {
   const router = useRouter();
 
   const handleLogin = (values: { username: string; password: string }) => {
     const { username, password } = values;
-    if ((username === 'kanri' || username === 'kannri') && password === 'pasuwa-do') {
+    const foundUser = USERNAME_PASSWORD_PAIRS.find(
+      (user: { username: string; password: string }) => user.username === username && user.password === password
+    );
+    if (foundUser) {
       router.push('/menu/news');
     } else {
       Modal.error({
