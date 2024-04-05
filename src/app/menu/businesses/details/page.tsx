@@ -23,12 +23,12 @@ export default function BusinessDetailsPage() {
 
   useEffect(() => {
     // ページ表示時に、パラメーターから id を取得
-    const handleRouteChange = () => {
+    const handleRouteChange = async () => {
       const queryId = window.location.search.split('?id=')[1];
       const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
       setId(convertedId);
 
-      fetchBusinessData(convertedId);
+      await fetchBusinessData(convertedId);
     };
     handleRouteChange(); // 初期レンダリング時にIDを取得
     window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
@@ -59,7 +59,7 @@ export default function BusinessDetailsPage() {
   const handleUpdate = async (values: BusinessRecord) => {
     setIsLoading(true);
     const fileManager = new FirebaseStorage();
-    let uploadedImageUrl = values.imagefile_url;
+    let uploadedImageUrl = businessData?.imagefile_url;
     try {
       if (isImageFileAdded && uploadedFile) {
         const fileName = DbKeyUtils.reGenerateDbKey(id);

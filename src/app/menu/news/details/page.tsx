@@ -29,18 +29,30 @@ export default function NewsDetailsPage() {
 
   useEffect(() => {
     // ページ表示時に、パラメーターから id を取得
-    const handleRouteChange = () => {
+    const handleRouteChange = async () => {
       const queryId = window.location.search.split('?id=')[1];
       const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
       setId(convertedId);
 
-      fetchNewsData(convertedId);
-      fetchCategories();
+      await fetchCategories();
+      await fetchNewsData(convertedId);
     };
     handleRouteChange(); // 初期レンダリング時にIDを取得
     window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
     return () => window.removeEventListener('popstate', handleRouteChange); // クリーンアップ関数
   }, []);
+
+  /**
+   * Category を取得します
+   */
+  const fetchCategories = async () => {
+    try {
+      const fetchedCategories = await new DalCategory().getAllCategory();
+      setCategoryRecords(fetchedCategories);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   /**
    * News を取得します
@@ -63,22 +75,10 @@ export default function NewsDetailsPage() {
     }
   };
 
-  /**
-   * Category を取得します
-   */
-  const fetchCategories = async () => {
-    try {
-      const fetchedCategories = await new DalCategory().getAllCategory();
-      setCategoryRecords(fetchedCategories);
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
-
   const handleUpdate = async (values: NewsRecord) => {
     setIsLoading(true);
     const fileManager = new FirebaseStorage();
-    let uploadedImageUrl = values.imagefile_url;
+    let uploadedImageUrl = newsData?.imagefile_url;
     try {
       if (isImageFileAdded && uploadedFile) {
         const fileName = DbKeyUtils.reGenerateDbKey(id);

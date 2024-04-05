@@ -18,11 +18,11 @@ export default function CategoryDetailsPage() {
 
   useEffect(() => {
     // ページ表示時に、パラメーターから id を取得
-    const handleRouteChange = () => {
+    const handleRouteChange = async () => {
       const queryId = window.location.search.split('?id=')[1];
       const convertedId = DbKeyUtils.convertBase62ToDbKey(queryId);
       setId(convertedId);
-      fetchCategoryData(convertedId);
+      await fetchCategoryData(convertedId);
     };
     handleRouteChange(); // 初期レンダリング時にIDを取得
     window.addEventListener('popstate', handleRouteChange); // ページ遷移時のイベントリスナー
