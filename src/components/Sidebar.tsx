@@ -56,10 +56,8 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
         <ul className="list-none pl-0">
           <li
             className={`${
-              pathname === '/menu/meta/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/meta/' ? 'bg-gray-400 dark:bg-gray-600' : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/meta" className="flex items-center px-4 py-2">
               <AppstoreOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -68,10 +66,10 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/top_page/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/top_page/'
+                ? 'bg-gray-400 dark:bg-gray-600'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/top_page" className="flex items-center px-4 py-2">
               <FormOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -80,10 +78,10 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/businesses/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/businesses/'
+                ? 'bg-gray-400 dark:bg-gray-600'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/businesses" className="flex items-center px-4 py-2">
               <SolutionOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -92,10 +90,10 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>{' '}
           <li
             className={`${
-              pathname === '/menu/categories/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/categories/'
+                ? 'bg-gray-400 dark:bg-gray-600'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/categories" className="flex items-center px-4 py-2">
               <BookOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -104,10 +102,8 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/news/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/news/' ? 'bg-gray-400 dark:bg-gray-600' : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/news" className="flex items-center px-4 py-2">
               <NotificationOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -116,10 +112,10 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/members/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/members/'
+                ? 'bg-gray-400 dark:bg-gray-600'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/members" className="flex items-center px-4 py-2">
               <TeamOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -128,10 +124,10 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/deployment/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-            } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
-              collapsed ? 'justify-center' : ''
-            }`}
+              pathname === '/menu/deployment/'
+                ? 'bg-gray-400 dark:bg-gray-600'
+                : 'hover:bg-gray-300 dark:hover:bg-gray-700'
+            } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <Link href="/menu/deployment" className="flex items-center px-4 py-2">
               <SyncOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
