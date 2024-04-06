@@ -56,7 +56,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
         <ul className="list-none pl-0">
           <li
             className={`${
-              pathname === '/menu/meta' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/meta/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -68,7 +68,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/top_page' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/top_page/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -80,7 +80,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/businesses' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/businesses/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -92,7 +92,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>{' '}
           <li
             className={`${
-              pathname === '/menu/categories' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/categories/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -104,7 +104,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/news' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/news/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -116,7 +116,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/members' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/members/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -128,7 +128,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           </li>
           <li
             className={`${
-              pathname === '/menu/deployment' ? 'bg-gray-400 dark:bg-gray-600' : ''
+              pathname === '/menu/deployment/' ? 'bg-gray-400 dark:bg-gray-600' : ''
             } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
               collapsed ? 'justify-center' : ''
             }`}
@@ -142,9 +142,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       </nav>
       <div className="mb-4">
         <li
-          className={`${
-            pathname === '/' ? 'bg-gray-400 dark:bg-gray-600' : ''
-          } hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
+          className={`hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
             collapsed ? 'justify-center' : ''
           }`}
           title={!collapsed ? 'ログアウト' : ''}
