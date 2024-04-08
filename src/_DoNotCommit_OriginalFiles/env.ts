@@ -8,3 +8,9 @@ export const FIREBASE_APP_ID = '1:************:web:**********************';
 
 // Realtime Database - データ タブを選択して画面に表示される情報
 export const FIREBASE_REALTIME_DATABASE_URL = 'https://********************-default-rtdb.firebaseio.com';
+
+// ユーザー名とパスワードのペア
+export const USERNAME_PASSWORD_PAIRS = [
+  { username: 'admin', password: 'admin' },
+  { username: 'root', password: 'root' },
+];
