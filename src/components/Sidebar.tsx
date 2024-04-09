@@ -1,4 +1,5 @@
 'use client';
+import { FirebaseAuthentication } from '@/features/FirebaseAuthentication';
 import {
   AppstoreOutlined,
   BookOutlined,
@@ -30,7 +31,8 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
     setIsModalOpen(true);
   };
 
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
+    await FirebaseAuthentication.logoutAndDeleteCurrentUser();
     router.push('/');
     setIsModalOpen(false);
   };
@@ -131,7 +133,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           >
             <Link href="/menu/deployment" className="flex items-center px-4 py-2">
               <SyncOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
-              {!collapsed && <span>本番環境展開</span>}
+              {!collapsed && <span>本番環境に反映</span>}
             </Link>
           </li>
         </ul>

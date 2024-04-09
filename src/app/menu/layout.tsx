@@ -1,4 +1,5 @@
 'use client';
+import { AuthGuard } from '@/components/AuthGuard';
 import Sidebar from '@/components/Sidebar';
 import { useState } from 'react';
 
@@ -11,8 +12,10 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-screen">
-      <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} />
-      <main className="flex-1 bg-gray-100">{children}</main>
+      <AuthGuard>
+        <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} />
+        <main className="flex-1 bg-gray-100">{children}</main>
+      </AuthGuard>
     </div>
   );
 }

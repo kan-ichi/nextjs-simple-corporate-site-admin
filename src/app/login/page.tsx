@@ -1,17 +1,19 @@
 'use client';
+import { USERNAME_PASSWORD_PAIRS } from '@/_DoNotCommit/env';
+import { FirebaseAuthentication } from '@/features/FirebaseAuthentication';
 import { Button, Form, Input, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
-import { USERNAME_PASSWORD_PAIRS } from '@/_DoNotCommit/env';
 
 export default function Login() {
   const router = useRouter();
 
-  const handleLogin = (values: { username: string; password: string }) => {
+  const handleLogin = async (values: { username: string; password: string }) => {
     const { username, password } = values;
     const foundUser = USERNAME_PASSWORD_PAIRS.find(
       (user: { username: string; password: string }) => user.username === username && user.password === password
     );
     if (foundUser) {
+      await FirebaseAuthentication.loginAsAnonymousUser();
       router.push('/menu/news');
     } else {
       Modal.error({
