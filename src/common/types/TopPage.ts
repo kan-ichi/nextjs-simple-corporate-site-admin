@@ -17,7 +17,8 @@ export interface TopPage {
   representative_name: string;
   capital_stock: string;
   is_hiring_visible: boolean;
-  hiring_message: string;
+  hiring_message?: string;
+  hiring_url?: string;
   is_member_visible: boolean;
 }
 
