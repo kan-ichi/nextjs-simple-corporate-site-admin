@@ -34,8 +34,9 @@ export class DalBusiness {
    * Business をDBに追加し、追加したレコードを返します
    */
   async addBusiness(data: Business, id?: string): Promise<BusinessRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const record = await dal.addRecord(data, id);
+    const record = await dal.addRecord(dataMatchedToDb, id);
     return { ...record.recordBase, ...record.data };
   }
 
@@ -61,8 +62,9 @@ export class DalBusiness {
    * DBの Business を更新します
    */
   async updateBusiness(data: BusinessRecord): Promise<BusinessRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const record = await dal.updateRecord(data, data.id);
+    const record = await dal.updateRecord(dataMatchedToDb, dataMatchedToDb.id);
     return { ...record.recordBase, ...record.data };
   }
 
@@ -70,13 +72,14 @@ export class DalBusiness {
    * DBの Business を更新します（既存レコードが無ければ追加します）
    */
   async upsertBusiness(data: BusinessRecord): Promise<BusinessRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const currentRecord = await dal.getRecordById(data.id);
+    const currentRecord = await dal.getRecordById(dataMatchedToDb.id);
     let record = null;
     if (currentRecord) {
-      record = await dal.updateRecord(data, data.id);
+      record = await dal.updateRecord(dataMatchedToDb, dataMatchedToDb.id);
     } else {
-      record = await dal.addRecord(data);
+      record = await dal.addRecord(dataMatchedToDb);
     }
     return { ...record.recordBase, ...record.data };
   }
@@ -87,5 +90,17 @@ export class DalBusiness {
   async deleteBusiness(id: string): Promise<void> {
     const dal = this.createFirebaseRealtimeDatabase();
     await dal.deleteRecord(id);
+  }
+
+  /**
+   * モデルをDB登録用の形式に変換します
+   */
+  private convertModelToDbFormat(data: Business): any;
+  private convertModelToDbFormat(data: BusinessRecord): any;
+  private convertModelToDbFormat(data: Business | BusinessRecord): any {
+    data.imagefile_url ??= '';
+    data.logo_url ??= '';
+    data.service_url ??= '';
+    return { ...data };
   }
 }

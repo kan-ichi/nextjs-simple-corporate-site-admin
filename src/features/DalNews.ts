@@ -34,19 +34,10 @@ export class DalNews {
    * News をDBに追加し、追加したレコードを返します
    */
   async addNews(data: News, id?: string): Promise<NewsRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const record = await dal.addRecord(
-      {
-        ...data,
-        release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
-        category_id: data.category_id || '',
-      },
-      id
-    );
-    return {
-      ...record.recordBase,
-      ...record.data,
-    };
+    const record = await dal.addRecord(dataMatchedToDb, id);
+    return { ...record.recordBase, ...record.data };
   }
 
   /**
@@ -71,32 +62,24 @@ export class DalNews {
    * DBの News を更新します
    */
   async updateNews(data: NewsRecord): Promise<NewsRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const record = await dal.updateRecord(
-      {
-        ...data,
-        release_date: FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date),
-        category_id: data.category_id || '',
-      },
-      data.id
-    );
-    return {
-      ...record.recordBase,
-      ...record.data,
-    };
+    const record = await dal.updateRecord(dataMatchedToDb, dataMatchedToDb.id);
+    return { ...record.recordBase, ...record.data };
   }
 
   /**
    * DBの News を更新します（既存レコードが無ければ追加します）
    */
   async upsertNews(data: NewsRecord): Promise<NewsRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const currentRecord = await dal.getRecordById(data.id);
+    const currentRecord = await dal.getRecordById(dataMatchedToDb.id);
     let record = null;
     if (currentRecord) {
-      record = await dal.updateRecord(data, data.id);
+      record = await dal.updateRecord(dataMatchedToDb, dataMatchedToDb.id);
     } else {
-      record = await dal.addRecord(data);
+      record = await dal.addRecord(dataMatchedToDb);
     }
     return { ...record.recordBase, ...record.data };
   }
@@ -107,5 +90,17 @@ export class DalNews {
   async deleteNews(id: string): Promise<void> {
     const dal = this.createFirebaseRealtimeDatabase();
     await dal.deleteRecord(id);
+  }
+
+  /**
+   * モデルをDB登録用の形式に変換します
+   */
+  private convertModelToDbFormat(data: News): any;
+  private convertModelToDbFormat(data: NewsRecord): any;
+  private convertModelToDbFormat(data: News | NewsRecord): any {
+    data.imagefile_url ??= '';
+    data.release_date = FirebaseRealtimeDatabase.convertDateTimeStringToDbDateTimeString(data.release_date);
+    data.category_id ??= '';
+    return { ...data };
   }
 }

@@ -48,14 +48,28 @@ export class DalMeta {
    * DBの Meta を更新します
    */
   async upsertMeta(data: Meta, id?: string): Promise<MetaRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
+    const dal = this.createFirebaseRealtimeDatabase();
     let newRecord: any;
     const oldRecord = await this.getMeta();
-    const dal = this.createFirebaseRealtimeDatabase();
     if (oldRecord) {
-      newRecord = await dal.updateRecord({ ...oldRecord, ...data }, oldRecord.id);
+      newRecord = await dal.updateRecord({ ...oldRecord, ...dataMatchedToDb }, oldRecord.id);
     } else {
-      newRecord = await dal.addRecord({ ...data }, id);
+      newRecord = await dal.addRecord({ ...dataMatchedToDb }, id);
     }
     return { ...newRecord.recordBase, ...newRecord.data };
+  }
+
+  /**
+   * モデルをDB登録用の形式に変換します
+   */
+  private convertModelToDbFormat(data: Meta): any {
+    data.title ??= '';
+    data.description ??= '';
+    data.og_title ??= '';
+    data.og_description ??= '';
+    data.og_image_url ??= '';
+    data.canonical_tag ??= '';
+    return { ...data };
   }
 }

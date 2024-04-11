@@ -19,13 +19,8 @@ export default function AddBusinessPage() {
   const handleSubmit = async (values: Business) => {
     setIsLoading(true);
     try {
-      const businessData: Business = {
-        ...values,
-        logo_url: values.logo_url || '',
-        service_url: values.service_url || '',
-      };
       const dal = new DalBusiness();
-      const addedRecord = await dal.addBusiness(businessData);
+      const addedRecord = await dal.addBusiness(values);
       if (isImageFileAdded && uploadedFile) {
         const uploadedImageUrl = await new FirebaseStorage().uploadImageFile(uploadedFile, addedRecord.id);
         await dal.updateBusiness({ ...addedRecord, imagefile_url: uploadedImageUrl });

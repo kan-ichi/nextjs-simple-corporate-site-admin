@@ -72,8 +72,6 @@ export default function BusinessDetailsPage() {
         ...values,
         id,
         imagefile_url: uploadedImageUrl,
-        logo_url: values.logo_url || '',
-        service_url: values.service_url || '',
       };
       await new DalBusiness().updateBusiness(updatedBusiness);
       message.success('事業内容が正常に更新されました');

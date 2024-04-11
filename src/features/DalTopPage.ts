@@ -37,13 +37,7 @@ export class DalTopPage {
     const dal = this.createFirebaseRealtimeDatabase();
     const records = await dal.getAllRecords();
     if (records.length !== 0) {
-      const data = records[0].data as TopPage;
-      return {
-        ...records[0].recordBase,
-        ...data,
-        is_hiring_visible: FirebaseRealtimeDatabase.convertStringToBoolean(data.is_hiring_visible),
-        is_member_visible: FirebaseRealtimeDatabase.convertStringToBoolean(data.is_member_visible),
-      };
+      return this.restoreModelFromDbFormat(records[0]);
     } else {
       return null;
     }
@@ -53,23 +47,41 @@ export class DalTopPage {
    * DBの TopPage を更新します
    */
   async upsertTopPage(data: TopPage, id?: string): Promise<TopPageRecord> {
+    const dataMatchedToDb = this.convertModelToDbFormat(data);
     const dal = this.createFirebaseRealtimeDatabase();
-    const is_hiring_visible = FirebaseRealtimeDatabase.convertBooleanToString(data.is_hiring_visible);
-    const is_member_visible = FirebaseRealtimeDatabase.convertBooleanToString(data.is_member_visible);
     let newRecord: any;
-
     const oldRecord = await this.getTopPage();
     if (oldRecord) {
-      newRecord = await dal.updateRecord({ ...oldRecord, ...data, is_hiring_visible, is_member_visible }, oldRecord.id);
+      newRecord = await dal.updateRecord({ ...oldRecord, ...dataMatchedToDb }, oldRecord.id);
     } else {
-      newRecord = await dal.addRecord({ ...data, is_hiring_visible, is_member_visible }, id);
+      newRecord = await dal.addRecord({ ...dataMatchedToDb }, id);
     }
 
+    return this.restoreModelFromDbFormat(newRecord);
+  }
+
+  /**
+   * モデルをDB登録用の形式に変換します
+   */
+  private convertModelToDbFormat(data: TopPage): any {
+    data.hiring_message ??= '';
+    data.hiring_url ??= '';
     return {
-      ...newRecord.recordBase,
-      ...newRecord.data,
-      is_hiring_visible: FirebaseRealtimeDatabase.convertStringToBoolean(newRecord.data.is_hiring_visible),
-      is_member_visible: FirebaseRealtimeDatabase.convertStringToBoolean(newRecord.data.is_member_visible),
+      ...data,
+      is_hiring_visible: FirebaseRealtimeDatabase.convertBooleanToString(data.is_hiring_visible),
+      is_member_visible: FirebaseRealtimeDatabase.convertBooleanToString(data.is_member_visible),
+    };
+  }
+
+  /**
+   * DBから取得した形式を元のモデルに戻します
+   */
+  private restoreModelFromDbFormat(data: any): TopPageRecord {
+    return {
+      ...data.recordBase,
+      ...data.data,
+      is_hiring_visible: FirebaseRealtimeDatabase.convertStringToBoolean(data.data.is_hiring_visible),
+      is_member_visible: FirebaseRealtimeDatabase.convertStringToBoolean(data.data.is_member_visible),
     };
   }
 }
