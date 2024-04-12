@@ -3,7 +3,7 @@ import { useAppGlobalContextValue } from '@/common/contexts/AppGlobalContext';
 import { TopPageRecord } from '@/common/types/TopPage';
 import { DalTopPage } from '@/features/DalTopPage';
 import { DeploymentManager } from '@/features/DeploymentManager';
-import { LoadingOutlined, WarningOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, LoadingOutlined, WarningOutlined } from '@ant-design/icons';
 import { Button, Modal, Space } from 'antd';
 import { useEffect, useState } from 'react';
 
@@ -48,7 +48,7 @@ export default function DeploymentPage() {
           ステージング環境URL（新しいタブで開きます）
         </a>
         <Button type="primary" onClick={handleDeployToProduction} loading={isLoading}>
-          本番環境に反映
+          ステージング環境の状態を本番環境に反映
         </Button>
         <a href={`${topPageRecord?.production_url}`} target="_blank" rel="noopener noreferrer">
           本番環境URL（新しいタブで開きます）
@@ -79,21 +79,21 @@ export default function DeploymentPage() {
         title={
           <div className="flex items-center">
             <LoadingOutlined style={{ fontSize: 24, marginRight: '8px' }} spin />
-            <span className="font-bold">デプロイ中</span>
+            <span className="font-bold">本番環境反映中</span>
           </div>
         }
         open={isLoadingModalOpen}
         footer={null}
         closable={false}
       >
-        <p>デプロイが進行中です。しばらくお待ちください。</p>
+        <p>本番環境反映が進行中です。しばらくお待ちください。</p>
       </Modal>
 
       <Modal
         title={
           <div className="flex items-center">
-            <WarningOutlined style={{ color: 'green', marginRight: '8px' }} />
-            <span className="font-bold">デプロイが完了しました。</span>
+            <CheckCircleOutlined style={{ color: 'green', marginRight: '8px' }} />
+            <span className="font-bold">本番環境反映が完了しました。</span>
           </div>
         }
         open={isDeployedModalOpen}
@@ -101,7 +101,7 @@ export default function DeploymentPage() {
         onCancel={() => setIsDeployedModalOpen(false)}
         okText="閉じる"
       >
-        <p>デプロイが正常に完了しました。</p>
+        <p>本番環境反映が正常に完了しました。</p>
       </Modal>
     </div>
   );
