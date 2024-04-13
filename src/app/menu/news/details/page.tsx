@@ -163,10 +163,7 @@ export default function NewsDetailsPage() {
             />
           </Form.Item>
           <Form.Item name="category_id" label="カテゴリー">
-            <Select
-              value={newsData?.category_id || ''}
-              onChange={(value) => form.setFieldsValue({ category_id: value })}
-            >
+            <Select value={newsData?.category_id} onChange={(value) => form.setFieldsValue({ category_id: value })}>
               <Option value="">（選択してください）</Option>
               {categoryRecords.map((ategoryRecord) => (
                 <Option key={ategoryRecord.id} value={ategoryRecord.id}>
