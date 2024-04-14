@@ -135,7 +135,7 @@ export default function TopPageForm() {
             <Switch checked={isHiringVisible} onChange={(checked) => setIsHiringVisible(checked)} />
             <span className="ml-2">採用情報を表示する</span>
           </Form.Item>
-          {isHiringVisible && (
+          <div className={`${isHiringVisible ? '' : 'hidden'}`}>
             <Form.Item
               name="hiring_message"
               label="採用メッセージ"
@@ -143,7 +143,10 @@ export default function TopPageForm() {
             >
               <Input.TextArea rows={3} />
             </Form.Item>
-          )}
+            <Form.Item name="hiring_url" label="採用ページURL">
+              <Input />
+            </Form.Item>
+          </div>
           <Form.Item name="is_member_visible" valuePropName="checked">
             <Switch checked={isMemberVisible} onChange={(checked) => setIsMemberVisible(checked)} />
             <span className="ml-2">メンバー紹介を表示する</span>
