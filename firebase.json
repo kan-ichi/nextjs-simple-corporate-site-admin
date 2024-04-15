@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "gorannos-ponser-admin",
+    "site": "projectId-admin",
     "public": "out",
     "ignore": [
       "firebase.json",
