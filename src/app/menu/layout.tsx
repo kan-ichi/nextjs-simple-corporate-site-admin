@@ -4,7 +4,7 @@ import Sidebar from '@/components/Sidebar';
 import { useState } from 'react';
 
 export default function MenuLayout({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
