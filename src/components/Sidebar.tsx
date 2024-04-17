@@ -50,6 +50,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
       <button
         className="flex items-center justify-center w-full py-2 bg-gray-200 dark:bg-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300"
         onClick={toggleCollapse}
+        title={collapsed ? '展開する' : '折りたたむ'}
       >
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         {!collapsed && <span className="ml-2">折りたたむ</span>}
@@ -60,6 +61,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
             className={`${
               pathname === '/menu/meta/' ? 'bg-gray-400 dark:bg-gray-600' : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="メタ情報編集"
           >
             <Link href="/menu/meta" className="flex items-center px-4 py-2">
               <AppstoreOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -72,6 +74,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
                 ? 'bg-gray-400 dark:bg-gray-600'
                 : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="トップページ編集"
           >
             <Link href="/menu/top_page" className="flex items-center px-4 py-2">
               <FormOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -84,18 +87,20 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
                 ? 'bg-gray-400 dark:bg-gray-600'
                 : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="事業内容一覧・編集"
           >
             <Link href="/menu/businesses" className="flex items-center px-4 py-2">
               <SolutionOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
               {!collapsed && <span>事業内容一覧・編集</span>}
             </Link>
-          </li>{' '}
+          </li>
           <li
             className={`${
               pathname === '/menu/categories/'
                 ? 'bg-gray-400 dark:bg-gray-600'
                 : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="カテゴリー一覧・編集"
           >
             <Link href="/menu/categories" className="flex items-center px-4 py-2">
               <BookOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -106,6 +111,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
             className={`${
               pathname === '/menu/news/' ? 'bg-gray-400 dark:bg-gray-600' : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="ニュース一覧・編集"
           >
             <Link href="/menu/news" className="flex items-center px-4 py-2">
               <NotificationOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -118,6 +124,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
                 ? 'bg-gray-400 dark:bg-gray-600'
                 : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="メンバー一覧・編集"
           >
             <Link href="/menu/members" className="flex items-center px-4 py-2">
               <TeamOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -130,6 +137,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
                 ? 'bg-gray-400 dark:bg-gray-600'
                 : 'hover:bg-gray-300 dark:hover:bg-gray-700'
             } transition-colors duration-300 ${collapsed ? 'justify-center' : ''}`}
+            title="本番環境に反映"
           >
             <Link href="/menu/deployment" className="flex items-center px-4 py-2">
               <SyncOutlined className={`${collapsed ? 'mx-auto' : 'mr-2'}`} />
@@ -143,7 +151,7 @@ export default function Sidebar({ collapsed, toggleCollapse }: SidebarProps) {
           className={`hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 ${
             collapsed ? 'justify-center' : ''
           }`}
-          title={!collapsed ? 'ログアウト' : ''}
+          title="ログアウト"
           onClick={handleLogout}
         >
           <div className="flex items-center px-4 py-2 cursor-pointer">
